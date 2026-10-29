@@ -25,7 +25,6 @@ public class Parroquia {
     @NotBlank(message = "El nombre es obligatorio.")
     private String nombre;
 
-    @Column(unique = true)
     @NotBlank(message = "El canton es obligatorio.")
     private String canton;
 
