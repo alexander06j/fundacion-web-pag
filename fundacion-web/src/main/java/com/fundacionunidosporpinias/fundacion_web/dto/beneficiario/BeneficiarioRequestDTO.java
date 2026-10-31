@@ -1,6 +1,7 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.beneficiario;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,8 @@ public class BeneficiarioRequestDTO {
 
     private String telefono;
     private String direccion;
+
+    @NotNull
+    private Long parroquiaId;
 
 }
