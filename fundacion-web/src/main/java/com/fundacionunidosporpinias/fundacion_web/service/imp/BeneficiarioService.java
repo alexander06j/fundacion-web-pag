@@ -71,7 +71,7 @@ public class BeneficiarioService implements IBeneficiarioService {
         Beneficiario beneficiario = beneficiarioRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Beneficiario no encontrado"));
 
-        Parroquia parroquia = parroquiaRepository.findById(id)
+        Parroquia parroquia = parroquiaRepository.findById(dto.getParroquiaId())
                 .orElseThrow(()-> new NotFoundException("Parroquia no encontrada"));
 
         beneficiario.setCedula(dto.getCedula());
