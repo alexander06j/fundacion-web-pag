@@ -18,6 +18,7 @@ import com.fundacionunidosporpinias.fundacion_web.repository.ProductoRepository;
 import com.fundacionunidosporpinias.fundacion_web.service.IEntregaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class EntregaService implements IEntregaService {
     }
 
     @Override
+    @Transactional
     public EntregaResponseDTO registrarEntrega(EntregaRequestDTO dto) {
         Beneficiario beneficiario = beneficiarioRepository.findById(dto.getBeneficiarioId())
                 .orElseThrow(()-> new NotFoundException("Beneficiario no encontrado"));
