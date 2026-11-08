@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+
+<div th:fragment="navbar">
+
+    <!-- Barra Lateral (Sidebar Fijo a la Izquierda) -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">🤝</div>
+            <div class="sidebar-title">
+                <h2>Fundación</h2>
+                <small>Unidos por Piñas</small>
+            </div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a th:href="@{/dashboard}" class="nav-link-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/dashboard/parroquias}" class="nav-link-item">
+                    <span class="icon">🗺️</span>
+                    <span>Parroquias</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/dashboard/productos}" class="nav-link-item">
+                    <span class="icon">📦</span>
+                    <span>Productos</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/dashboard/beneficiarios}" class="nav-link-item">
+                    <span class="icon">👥</span>
+                    <span>Beneficiarios</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/dashboard/entregas}" class="nav-link-item">
+                    <span class="icon">📋</span>
+                    <span>Historial</span>
+                </a>
+            </li>
+            <!-- Solo visible para el Administrador -->
+            <li th:if="${esAdmin}">
+                <a th:href="@{/dashboard/usuarios}" class="nav-link-item">
+                    <span class="icon">🔐</span>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Barra Superior (Navbar Superior) -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="system-tag">Sistema de Gestión Social y Comunitaria</span>
+        </div>
+
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="avatar">👤</span>
+                <span class="user-role">
+                    <span th:text="${usuarioNombre}">Usuario</span>
+                    (<span th:text="${usuarioRol}">Rol</span>)
+                </span>
+            </div>
+
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-logout">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </header>
+</div>
+
+</body>
+</html>
