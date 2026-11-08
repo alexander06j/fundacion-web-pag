@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Beneficiarios')}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1>Gestión de Beneficiarios</h1>
+
+        <div class="header-actions">
+            <a th:href="@{/dashboard/beneficiarios/exportar/excel(q=${q})}" class="btn btn-excel"
+               title="Descargar listado en formato Excel (.xlsx)">
+                 Exportar a Excel (XLSX)
+            </a>
+
+            <a th:if="${puedeEditar}" th:href="@{/dashboard/beneficiarios/nuevo}" class="btn btn-primary">
+                ➕ Nuevo Beneficiario
+            </a>
+        </div>
+    </div>
+
+    <!-- Mensaje de error/alerta si ocurre restricción -->
+    <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
+        ⚠️ <span th:text="${errorMensaje}"></span>
+    </div>
+
+    <!-- Buscador y Paginación en Servidor -->
+    <div class="card" style="margin-bottom: 20px; padding: 16px;">
+        <form th:action="@{/dashboard/beneficiarios}" method="get" class="search-toolbar">
+            <div class="search-input-wrap">
+                <input type="text" name="q" th:value="${q}" class="form-control"
+                       placeholder="🔍 Buscar por nombre, apellido, cédula o parroquia...">
+            </div>
+
+            <div class="search-size-wrap">
+                <select name="size" class="form-control" onchange="this.form.submit()"
+                        aria-label="Registros por página">
+                    <option value="10" th:selected="${size == 10}">10 por página</option>
+                    <option value="25" th:selected="${size == 25}">25 por página</option>
+                    <option value="50" th:selected="${size == 50}">50 por página</option>
+                </select>
+            </div>
+
+            <div class="search-actions">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+                <a th:if="${!#strings.isEmpty(q)}" th:href="@{/dashboard/beneficiarios(size=${size})}"
+                   class="btn btn-secondary">
+                    Limpiar
+                </a>
+            </div>
+        </form>
+
+        <div class="search-summary" th:if="${pagina != null}">
+                <span th:if="${pagina.totalElements > 0}">
+                    Mostrando
+                    <strong th:text="${pagina.number * pagina.size + 1}">1</strong>–<strong
+                        th:text="${pagina.number * pagina.size + pagina.numberOfElements}">10</strong>
+                    de <strong th:text="${pagina.totalElements}">0</strong> beneficiario(s)
+                </span>
+            <span th:if="${pagina.totalElements == 0}">
+                    Sin coincidencias para la búsqueda actual.
+                </span>
+            <span th:if="${!#strings.isEmpty(q)}" class="badge badge-info" style="margin-left: 8px;"
+                  th:text="${'Filtro: ' + q}"></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="tabla-responsive">
+            <table class="tabla" id="tablaBeneficiarios">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Parroquia</th>
+                    <th>Auditoría</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="beneficiario : ${beneficiarios}">
+                    <td th:text="${beneficiario.id}"></td>
+                    <td th:text="${beneficiario.cedula}"></td>
+                    <td th:text="${beneficiario.nombre}"></td>
+                    <td th:text="${beneficiario.apellido}"></td>
+                    <td
+                            th:text="${beneficiario.telefono != null and !beneficiario.telefono.isBlank() ? beneficiario.telefono : '-'}">
+                    </td>
+                    <td>
+                        <span class="badge badge-success" th:text="${beneficiario.parroquiaNombre}"></span>
+                    </td>
+                    <td>
+                        <div th:replace="~{fragments/auditoria :: celda(${beneficiario})}"></div>
+                    </td>
+                    <td>
+                        <span th:unless="${puedeEditar}" class="badge badge-neutral">Solo lectura</span>
+                        <div class="acciones" th:if="${puedeEditar}">
+                            <a th:href="@{/dashboard/beneficiarios/{id}/editar(id=${beneficiario.id})}"
+                               class="btn btn-primary btn-sm">
+                                Editar
+                            </a>
+
+                            <form th:if="${esAdmin}"
+                                  th:action="@{/dashboard/beneficiarios/{id}/eliminar(id=${beneficiario.id})}"
+                                  method="post"
+                                  th:attr="data-nombre=${beneficiario.nombre + ' ' + beneficiario.apellido}"
+                                  onsubmit="return confirmarEliminacion(this);">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(beneficiarios)}">
+                    <td colspan="8" style="text-align: center; color: #64748b; padding: 28px;">
+                        No se encontraron beneficiarios registrados.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Controles de Paginación [Anterior] [1] [2] [Siguiente] -->
+        <div class="pagination-bar" th:if="${pagina != null and pagina.totalPages > 1}">
+            <div class="pagination-info">
+                Página <strong th:text="${pagina.number + 1}">1</strong> de <strong
+                    th:text="${pagina.totalPages}">1</strong>
+            </div>
+
+            <nav class="pagination-controls" aria-label="Paginación de beneficiarios">
+                <!-- Anterior -->
+                <a th:if="${pagina.hasPrevious()}"
+                   th:href="@{/dashboard/beneficiarios(page=${pagina.number - 1}, size=${size}, q=${q})}"
+                   class="page-btn">
+                    « Anterior
+                </a>
+                <span th:unless="${pagina.hasPrevious()}" class="page-btn disabled">« Anterior</span>
+
+                <!-- Salto rápido a página 1 si la ventana no la incluye -->
+                <th:block th:if="${!#lists.isEmpty(numerosPagina) and numerosPagina[0] > 0}">
+                    <a th:href="@{/dashboard/beneficiarios(page=0, size=${size}, q=${q})}" class="page-btn">1</a>
+                    <span th:if="${numerosPagina[0] > 1}" class="page-ellipsis">…</span>
+                </th:block>
+
+                <!-- Ventana de páginas -->
+                <a th:each="num : ${numerosPagina}"
+                   th:href="@{/dashboard/beneficiarios(page=${num}, size=${size}, q=${q})}" th:text="${num + 1}"
+                   th:class="${num == pagina.number} ? 'page-btn active' : 'page-btn'">
+                </a>
+
+                <!-- Salto rápido a última página -->
+                <th:block
+                        th:if="${!#lists.isEmpty(numerosPagina) and numerosPagina[#lists.size(numerosPagina) - 1] < pagina.totalPages - 1}">
+                        <span th:if="${numerosPagina[#lists.size(numerosPagina) - 1] < pagina.totalPages - 2}"
+                              class="page-ellipsis">…</span>
+                    <a th:href="@{/dashboard/beneficiarios(page=${pagina.totalPages - 1}, size=${size}, q=${q})}"
+                       th:text="${pagina.totalPages}" class="page-btn"></a>
+                </th:block>
+
+                <!-- Siguiente -->
+                <a th:if="${pagina.hasNext()}"
+                   th:href="@{/dashboard/beneficiarios(page=${pagina.number + 1}, size=${size}, q=${q})}"
+                   class="page-btn">
+                    Siguiente »
+                </a>
+                <span th:unless="${pagina.hasNext()}" class="page-btn disabled">Siguiente »</span>
+            </nav>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function confirmarEliminacion(form) {
+        const nombre = form.dataset.nombre;
+        return confirm(`¿Desea eliminar al beneficiario "${nombre}"?\n\nEsta acción no se puede deshacer.`);
+    }
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>
