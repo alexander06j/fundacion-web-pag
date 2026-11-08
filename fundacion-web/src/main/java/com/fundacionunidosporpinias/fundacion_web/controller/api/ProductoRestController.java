@@ -25,7 +25,7 @@ public class ProductoRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ProductoResponseDTO> buscarPorId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productoService.findById(id));
     }
 
@@ -38,7 +38,7 @@ public class ProductoRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> actualizar(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody ProductoRequestDTO dto) {
 
         return ResponseEntity.ok(
@@ -47,7 +47,7 @@ public class ProductoRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
         productoService.delete(id);
         return ResponseEntity.noContent().build();
     }
