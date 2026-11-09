@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Beneficiario {
+public class Beneficiario extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
