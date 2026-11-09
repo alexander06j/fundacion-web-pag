@@ -17,6 +17,8 @@ import com.fundacionunidosporpinias.fundacion_web.repository.EntregaRepository;
 import com.fundacionunidosporpinias.fundacion_web.repository.ProductoRepository;
 import com.fundacionunidosporpinias.fundacion_web.service.IEntregaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,12 @@ public class EntregaService implements IEntregaService {
     @Override
     public List<EntregaResumenDTO> findAll() {
         return resumenMapper.toResumenDTOList(entregaRepository.findAll());
+    }
+
+    @Override
+    public Page<EntregaResumenDTO> buscarPaginado(String q, LocalDate desde, LocalDate hasta, Pageable pageable) {
+        String filtro = q == null ? "" : q.trim();
+        return entregaRepository.buscar(filtro, desde, hasta, pageable).map(resumenMapper::toResumenDTO);
     }
 
     @Override
