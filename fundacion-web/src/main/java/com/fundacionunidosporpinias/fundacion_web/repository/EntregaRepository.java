@@ -1,6 +1,8 @@
 package com.fundacionunidosporpinias.fundacion_web.repository;
 
 import com.fundacionunidosporpinias.fundacion_web.model.Entrega;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +34,14 @@ public interface EntregaRepository extends JpaRepository<Entrega, Long> {
                and (:hasta is null or e.fechaEntrega <= :hasta)
             """;
 
+    // Búsqueda paginada en servidor
+    @Query(value = "select e from Entrega e join fetch e.beneficiario b join fetch b.parroquia p" + FILTRO_BUSQUEDA,
+            countQuery = "select count(e) from Entrega e join e.beneficiario b join b.parroquia p" + FILTRO_BUSQUEDA)
+    Page<Entrega> buscar(@Param("q") String q,
+                         @Param("desde") LocalDate desde,
+                         @Param("hasta") LocalDate hasta,
+                         Pageable pageable);
+
     // Misma búsqueda, sin paginar y con los productos entregados, para la exportación a Excel
     @Query("select distinct e from Entrega e join fetch e.beneficiario b join fetch b.parroquia p"
             + " left join fetch e.detalles d left join fetch d.producto"
@@ -44,5 +54,4 @@ public interface EntregaRepository extends JpaRepository<Entrega, Long> {
     // Número de entregas por beneficiario: [beneficiarioId, total]
     @Query("select e.beneficiario.id, count(e) from Entrega e group by e.beneficiario.id")
     List<Object[]> contarPorBeneficiario();
-
 }
