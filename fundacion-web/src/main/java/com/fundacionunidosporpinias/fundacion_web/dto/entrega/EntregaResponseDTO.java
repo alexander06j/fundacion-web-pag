@@ -1,5 +1,6 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.entrega;
 
+import com.fundacionunidosporpinias.fundacion_web.dto.AuditoriaDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EntregaResponseDTO {
+public class EntregaResponseDTO extends AuditoriaDTO {
 
     private Long id;
 

@@ -1,5 +1,6 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.beneficiario;
 
+import com.fundacionunidosporpinias.fundacion_web.dto.AuditoriaDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BeneficiarioResponseDTO {
+public class BeneficiarioResponseDTO extends AuditoriaDTO {
 
     private Long id;
 
