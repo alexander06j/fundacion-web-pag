@@ -6,11 +6,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 /**
  * Autentica a los usuarios contra la tabla "usuario" de la base de datos.
  * Reemplaza al usuario único en memoria definido por SS_USER / SS_PASSWORD.
  */
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
