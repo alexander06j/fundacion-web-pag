@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<meta charset="UTF-8">
 <body>
 
 <!-- Celda compacta de auditoría para tablas -->
@@ -8,12 +7,12 @@
     <th:block th:if="${item != null and item.tieneAuditoria}">
         <div th:if="${item.fueEditado}"
              th:title="${'Creado por: ' + (item.creadoPor ?: '-') + ' (' + (item.fechaCreacionFormateada ?: '-') + ') | Editado por: ' + (item.modificadoPor ?: '-') + ' (' + (item.fechaModificacionFormateada ?: '-') + ')'}">
-            <span class="audit-user">✏️ <span th:text="${item.modificadoPor ?: item.creadoPor}"></span></span>
+            <span class="audit-user"><span th:text="${item.modificadoPor ?: item.creadoPor}"></span></span>
             <small class="audit-date" th:text="${item.fechaModificacionFormateada ?: item.fechaCreacionFormateada}"></small>
         </div>
         <div th:unless="${item.fueEditado}"
              th:title="${'Creado por: ' + (item.creadoPor ?: '-') + ' (' + (item.fechaCreacionFormateada ?: '-') + ')'}">
-            <span class="audit-user">👤 <span th:text="${item.creadoPor ?: item.modificadoPor ?: '-'}"></span></span>
+            <span class="audit-user"><span th:text="${item.creadoPor ?: item.modificadoPor ?: '-'}"></span></span>
             <small class="audit-date" th:text="${item.fechaCreacionFormateada ?: item.fechaModificacionFormateada ?: ''}"></small>
         </div>
     </th:block>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<meta charset="UTF-8">
+
 <head th:replace="~{fragments/head :: head('Dashboard')}"></head>
 
 <body>
@@ -16,7 +16,7 @@
         </div>
         <div>
             <a th:href="@{/dashboard/entregas/nuevo}" class="btn btn-success">
-                ➕ Registrar Nueva Entrega
+                Registrar Nueva Entrega
             </a>
         </div>
     </div>
@@ -25,7 +25,13 @@
     <div class="kpi-grid">
 
         <div class="kpi-card">
-            <div class="kpi-icon icon-blue"></div>
+            <div class="kpi-icon icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    <line x1="9" y1="3" x2="9" y2="18"/>
+                    <line x1="15" y1="6" x2="15" y2="21"/>
+                </svg>
+            </div>
             <div class="kpi-content">
                 <span class="kpi-title">Parroquias Cubiertas</span>
                 <span class="kpi-value" th:text="${totalParroquias}">0</span>
@@ -34,7 +40,14 @@
         </div>
 
         <div class="kpi-card">
-            <div class="kpi-icon icon-indigo"></div>
+            <div class="kpi-icon icon-indigo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
             <div class="kpi-content">
                 <span class="kpi-title">Total Beneficiarios</span>
                 <span class="kpi-value" th:text="${totalBeneficiarios}">0</span>
@@ -43,7 +56,13 @@
         </div>
 
         <div class="kpi-card" th:classappend="${productosBajoStock > 0} ? 'kpi-alert-border' : ''">
-            <div class="kpi-icon" th:classappend="${productosBajoStock > 0} ? 'icon-red' : 'icon-gray'">⚠️</div>
+            <div class="kpi-icon" th:classappend="${productosBajoStock > 0} ? 'icon-red' : 'icon-gray'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
             <div class="kpi-content">
                 <span class="kpi-title">Productos Bajo Stock</span>
                 <span class="kpi-value" th:classappend="${productosBajoStock > 0} ? 'text-danger' : ''" th:text="${productosBajoStock}">0</span>
@@ -52,7 +71,12 @@
         </div>
 
         <div class="kpi-card">
-            <div class="kpi-icon icon-green"></div>
+            <div class="kpi-icon icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+            </div>
             <div class="kpi-content">
                 <span class="kpi-title">Entregas Realizadas</span>
                 <span class="kpi-value text-success" th:text="${entregasUltimoMes}">0</span>
@@ -62,12 +86,12 @@
 
     </div>
 
-    <!-- Zona de Gráficas (Two Columns) -->
+    <!-- Zona de Gráficas (Dos Columnas) -->
     <div class="charts-grid">
 
         <div class="card chart-card">
             <div class="chart-header">
-                <h3> Historial de Entregas</h3>
+                <h3>Historial de Entregas</h3>
                 <small>Evolución de entregas en los últimos meses</small>
             </div>
             <div class="chart-container">
@@ -77,7 +101,7 @@
 
         <div class="card chart-card">
             <div class="chart-header">
-                <h3> Beneficiarios por Parroquia</h3>
+                <h3>Beneficiarios por Parroquia</h3>
                 <small>Distribución territorial de la ayuda social</small>
             </div>
             <div class="chart-container">
@@ -95,7 +119,7 @@
                 <small>Últimas 5 entregas registradas en el sistema</small>
             </div>
             <a th:href="@{/dashboard/entregas}" class="btn btn-secondary">
-                Ver Historial Completo →
+                Ver Historial Completo
             </a>
         </div>
 
