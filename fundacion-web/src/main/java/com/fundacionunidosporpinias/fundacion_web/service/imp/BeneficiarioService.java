@@ -12,6 +12,8 @@ import com.fundacionunidosporpinias.fundacion_web.repository.BeneficiarioReposit
 import com.fundacionunidosporpinias.fundacion_web.repository.ParroquiaRepository;
 import com.fundacionunidosporpinias.fundacion_web.service.IBeneficiarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,12 @@ public class BeneficiarioService implements IBeneficiarioService {
     @Override
     public List<BeneficiarioResponseDTO> findAll() {
         return mapper.toResponseDTOList(beneficiarioRepository.findAll());
+    }
+
+    @Override
+    public Page<BeneficiarioResponseDTO> buscarPaginado(String q, Pageable pageable) {
+        String filtro = q == null ? "" : q.trim();
+        return beneficiarioRepository.buscar(filtro, pageable).map(mapper::toResponseDTO);
     }
 
     @Override
@@ -71,7 +79,7 @@ public class BeneficiarioService implements IBeneficiarioService {
         Beneficiario beneficiario = beneficiarioRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Beneficiario no encontrado"));
 
-        Parroquia parroquia = parroquiaRepository.findById(id)
+        Parroquia parroquia = parroquiaRepository.findById(dto.getParroquiaId())
                 .orElseThrow(()-> new NotFoundException("Parroquia no encontrada"));
 
         beneficiario.setCedula(dto.getCedula());

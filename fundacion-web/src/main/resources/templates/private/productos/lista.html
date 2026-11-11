@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head th:replace="~{fragments/head :: head('Productos')}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1>Gestión de Productos</h1>
+
+        <a th:if="${puedeEditar}" th:href="@{/dashboard/productos/nuevo}" class="btn btn-primary">
+            ➕ Nuevo Producto
+        </a>
+    </div>
+
+    <!-- Mensaje de error/alerta si ocurre restricción -->
+    <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
+        ⚠️ <span th:text="${errorMensaje}"></span>
+    </div>
+
+    <!-- Buscador / Filtro Rápido -->
+    <div class="card" style="margin-bottom: 20px; padding: 16px;">
+        <input type="text" id="buscadorTabla" class="form-control" placeholder="🔍 Buscar por nombre o categoría..."
+               onkeyup="filtrarTabla()">
+    </div>
+
+    <div class="card">
+        <div class="tabla-responsive">
+            <table class="tabla" id="tablaProductos">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Stock</th>
+                    <th>Categoría</th>
+                    <th>Auditoría</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="producto : ${productos}">
+                    <td th:text="${producto.id}"></td>
+                    <td th:text="${producto.nombre}"></td>
+                    <td>
+                                <span th:class="${producto.stock < 10} ? 'badge badge-danger' : 'badge badge-success'"
+                                      th:text="${producto.stock} + ' unidades'">
+                                </span>
+                    </td>
+                    <td th:text="${producto.categoria}"></td>
+                    <td>
+                        <div th:replace="~{fragments/auditoria :: celda(${producto})}"></div>
+                    </td>
+                    <td>
+                        <span th:unless="${puedeEditar}" class="badge badge-neutral">Solo lectura</span>
+                        <div class="acciones" th:if="${puedeEditar}">
+                            <a th:href="@{/dashboard/productos/{id}/editar(id=${producto.id})}"
+                               class="btn btn-primary">
+                                Editar
+                            </a>
+
+                            <form th:if="${esAdmin}"
+                                  th:action="@{/dashboard/productos/{id}/eliminar(id=${producto.id})}"
+                                  method="post" th:attr="data-nombre=${producto.nombre}"
+                                  onsubmit="return confirmarEliminacion(this);">
+                                <button type="submit" class="btn btn-danger">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(productos)}">
+                    <td colspan="6">No existen productos registrados.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function confirmarEliminacion(form) {
+        const nombre = form.dataset.nombre;
+        return confirm(`¿Desea eliminar el producto "${nombre}"?\n\nEsta acción no se puede deshacer.`);
+    }
+
+    function filtrarTabla() {
+        const input = document.getElementById("buscadorTabla");
+        const filter = input.value.toLowerCase();
+        const filas = document.querySelectorAll("#tablaProductos tbody tr");
+
+        filas.forEach(fila => {
+            const texto = fila.textContent.toLowerCase();
+            fila.style.display = texto.includes(filter) ? "" : "none";
+        });
+    }
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

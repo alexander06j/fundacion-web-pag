@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(${titulo})}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="${titulo}"></h1>
+
+        <a th:href="@{/dashboard/beneficiarios}" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <div class="card">
+        <form th:action="${modoEdicion}
+                ? @{/dashboard/beneficiarios/{id}(id=${beneficiarioId})}
+                : @{/dashboard/beneficiarios}"
+              th:object="${beneficiario}"
+              method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Cédula de Identidad</label>
+                    <input type="text" th:field="*{cedula}" class="form-control" placeholder="Ej. 0701234567">
+                    <small class="error" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Teléfono de Contacto</label>
+                    <input type="text" th:field="*{telefono}" class="form-control" placeholder="Ej. 0987654321">
+                </div>
+
+                <div class="form-group">
+                    <label>Nombres</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej. Juan Carlos">
+                    <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Apellidos</label>
+                    <input type="text" th:field="*{apellido}" class="form-control" placeholder="Ej. Pérez Loayza">
+                    <small class="error" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></small>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Dirección / Sector</label>
+                    <input type="text" th:field="*{direccion}" class="form-control" placeholder="Ej. Barrio Central, Av. Loja y Sucre">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Parroquia de Residencia</label>
+                    <select th:field="*{parroquiaId}" class="form-control" required>
+                        <option value="">-- Seleccione una parroquia --</option>
+                        <option th:each="parroquia : ${parroquias}"
+                                th:value="${parroquia.id}"
+                                th:text="${parroquia.nombre + ' (' + parroquia.canton + ')'}">
+                        </option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('parroquiaId')}" th:errors="*{parroquiaId}"></small>
+                </div>
+
+            </div>
+
+            <div th:if="${modoEdicion}" th:replace="~{fragments/auditoria :: panel(${auditoria})}"></div>
+
+            <!-- Botones de acción alineados a la derecha -->
+            <div class="form-actions">
+                <a th:href="@{/dashboard/beneficiarios}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <span th:text="${modoEdicion} ? 'Actualizar Beneficiario' : 'Guardar Beneficiario'"></span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

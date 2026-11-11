@@ -32,12 +32,12 @@ public class ParroquiaRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ParroquiaResponseDTO> actualizar(@PathVariable Long id,@Valid @RequestBody ParroquiaRequestDTO dto){
+    public ResponseEntity<ParroquiaResponseDTO> actualizar(@PathVariable("id") Long id,@Valid @RequestBody ParroquiaRequestDTO dto){
         return ResponseEntity.ok(parroquiaService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id){
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id){
         parroquiaService.delete(id);
         return ResponseEntity.noContent().build();
     }

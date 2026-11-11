@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Celda compacta de auditoría para tablas -->
+<div th:fragment="celda(item)" class="audit-cell">
+    <th:block th:if="${item != null and item.tieneAuditoria}">
+        <div th:if="${item.fueEditado}"
+             th:title="${'Creado por: ' + (item.creadoPor ?: '-') + ' (' + (item.fechaCreacionFormateada ?: '-') + ') | Editado por: ' + (item.modificadoPor ?: '-') + ' (' + (item.fechaModificacionFormateada ?: '-') + ')'}">
+            <span class="audit-user"><span th:text="${item.modificadoPor ?: item.creadoPor}"></span></span>
+            <small class="audit-date" th:text="${item.fechaModificacionFormateada ?: item.fechaCreacionFormateada}"></small>
+        </div>
+        <div th:unless="${item.fueEditado}"
+             th:title="${'Creado por: ' + (item.creadoPor ?: '-') + ' (' + (item.fechaCreacionFormateada ?: '-') + ')'}">
+            <span class="audit-user"><span th:text="${item.creadoPor ?: item.modificadoPor ?: '-'}"></span></span>
+            <small class="audit-date" th:text="${item.fechaCreacionFormateada ?: item.fechaModificacionFormateada ?: ''}"></small>
+        </div>
+    </th:block>
+    <span th:if="${item == null or !item.tieneAuditoria}" class="audit-empty">—</span>
+</div>
+
+<!-- Panel completo de trazabilidad para formularios de edición y vistas de detalle -->
+<div th:fragment="panel(auditoria)"
+     th:if="${auditoria != null and auditoria.tieneAuditoria}"
+     class="audit-panel">
+    <div class="audit-panel-title">🕒 Trazabilidad del Registro</div>
+    <div class="audit-panel-grid">
+        <div>
+            <span class="audit-label">Creado por:</span>
+            <strong th:text="${auditoria.creadoPor ?: 'No disponible'}"></strong>
+            <span th:if="${auditoria.fechaCreacionFormateada != null}"
+                  class="audit-timestamp"
+                  th:text="${' · ' + auditoria.fechaCreacionFormateada}"></span>
+        </div>
+        <div>
+            <span class="audit-label">Última modificación:</span>
+            <strong th:text="${auditoria.modificadoPor ?: auditoria.creadoPor ?: 'No disponible'}"></strong>
+            <span th:if="${auditoria.fechaModificacionFormateada != null}"
+                  class="audit-timestamp"
+                  th:text="${' · ' + auditoria.fechaModificacionFormateada}"></span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

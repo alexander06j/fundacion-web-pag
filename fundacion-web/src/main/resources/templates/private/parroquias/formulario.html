@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head th:replace="~{fragments/head :: head(${titulo})}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        <h1 th:text="${titulo}"></h1>
+
+        <a th:href="@{/dashboard/parroquias}" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <div class="card form-single-column">
+        <form th:action="${modoEdicion}
+                ? @{/dashboard/parroquias/{id}(id=${parroquiaId})}
+                : @{/dashboard/parroquias}"
+              th:object="${parroquia}"
+              method="post">
+
+            <div class="form-group">
+                <label>Nombre de la Parroquia</label>
+                <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej. Piñas Grande, Moromoro, Capiro">
+                <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+            </div>
+
+            <div class="form-group">
+                <label>Cantón</label>
+                <input type="text" th:field="*{canton}" class="form-control" placeholder="Ej. Piñas">
+                <small class="error" th:if="${#fields.hasErrors('canton')}" th:errors="*{canton}"></small>
+            </div>
+
+            <div th:if="${modoEdicion}" th:replace="~{fragments/auditoria :: panel(${auditoria})}"></div>
+
+            <!-- Botones de acción alineados a la derecha -->
+            <div class="form-actions">
+                <a th:href="@{/dashboard/parroquias}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <span th:text="${modoEdicion} ? 'Actualizar Parroquia' : 'Guardar Parroquia'"></span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

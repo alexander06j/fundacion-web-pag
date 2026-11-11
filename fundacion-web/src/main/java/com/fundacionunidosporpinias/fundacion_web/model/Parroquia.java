@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Parroquia {
+public class Parroquia extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

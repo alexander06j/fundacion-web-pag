@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Dashboard')}"></head>
+
+<body>
+
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+
+<div class="container">
+
+    <div class="welcome-banner">
+        <div>
+            <h1>Panel de Control General</h1>
+            <p>Monitoreo en tiempo real de cobertura comunitaria, inventario y logística de entregas.</p>
+        </div>
+        <div>
+            <a th:href="@{/dashboard/entregas/nuevo}" class="btn btn-success">
+                Registrar Nueva Entrega
+            </a>
+        </div>
+    </div>
+
+    <!-- Fila de Tarjetas de Resumen (KPIs) -->
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-icon icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    <line x1="9" y1="3" x2="9" y2="18"/>
+                    <line x1="15" y1="6" x2="15" y2="21"/>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-title">Parroquias Cubiertas</span>
+                <span class="kpi-value" th:text="${totalParroquias}">0</span>
+                <span class="kpi-subtext">Cantón Piñas</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon icon-indigo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-title">Total Beneficiarios</span>
+                <span class="kpi-value" th:text="${totalBeneficiarios}">0</span>
+                <span class="kpi-subtext">Familias registradas</span>
+            </div>
+        </div>
+
+        <div class="kpi-card" th:classappend="${productosBajoStock > 0} ? 'kpi-alert-border' : ''">
+            <div class="kpi-icon" th:classappend="${productosBajoStock > 0} ? 'icon-red' : 'icon-gray'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-title">Productos Bajo Stock</span>
+                <span class="kpi-value" th:classappend="${productosBajoStock > 0} ? 'text-danger' : ''" th:text="${productosBajoStock}">0</span>
+                <span class="kpi-subtext">Menos de 10 unidades</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-title">Entregas Realizadas</span>
+                <span class="kpi-value text-success" th:text="${entregasUltimoMes}">0</span>
+                <span class="kpi-subtext">Último período</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Zona de Gráficas (Dos Columnas) -->
+    <div class="charts-grid">
+
+        <div class="card chart-card">
+            <div class="chart-header">
+                <h3>Historial de Entregas</h3>
+                <small>Evolución de entregas en los últimos meses</small>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartEntregas"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="chart-header">
+                <h3>Beneficiarios por Parroquia</h3>
+                <small>Distribución territorial de la ayuda social</small>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartParroquias"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabla de Actividad Reciente -->
+    <div class="card recent-activity-card">
+        <div class="section-header">
+            <div>
+                <h2>Actividad Reciente</h2>
+                <small>Últimas 5 entregas registradas en el sistema</small>
+            </div>
+            <a th:href="@{/dashboard/entregas}" class="btn btn-secondary">
+                Ver Historial Completo
+            </a>
+        </div>
+
+        <div class="tabla-responsive">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Beneficiario</th>
+                    <th>Parroquia</th>
+                    <th>Acción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entrega : ${ultimasEntregas}">
+                    <td th:text="${'#' + entrega.id}"></td>
+                    <td th:text="${entrega.fechaEntrega}"></td>
+                    <td th:text="${entrega.beneficiarioNombre}"></td>
+                    <td>
+                        <span class="badge badge-success" th:text="${entrega.parroquiaNombre}"></span>
+                    </td>
+                    <td>
+                        <a th:href="@{/dashboard/entregas/{id}(id=${entrega.id})}" class="btn btn-primary btn-sm">
+                            Detalles
+                        </a>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(ultimasEntregas)}">
+                    <td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">
+                        No existen entregas registradas recientemente.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js para las gráficas analíticas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const mesesLabels = /*[[${mesesLabels}]]*/ ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+    const mesesData = /*[[${mesesData}]]*/ [0, 0, 0, 0, 0, 0];
+
+    const parroquiasLabels = /*[[${parroquiasLabels}]]*/ ['Centro', 'Moromoro', 'Capiro', 'La Bocana'];
+    const parroquiasData = /*[[${parroquiasData}]]*/ [1, 1, 1, 1];
+
+    // Gráfica de Barras: Historial de Entregas
+    const ctxEntregas = document.getElementById('chartEntregas').getContext('2d');
+    new Chart(ctxEntregas, {
+        type: 'bar',
+        data: {
+            labels: mesesLabels,
+            datasets: [{
+                label: 'Entregas',
+                data: mesesData,
+                backgroundColor: 'rgba(30, 58, 138, 0.85)',
+                borderColor: '#1e3a8a',
+                borderRadius: 6,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+    // Gráfica de Donut: Distribución de Beneficiarios
+    const ctxParroquias = document.getElementById('chartParroquias').getContext('2d');
+    new Chart(ctxParroquias, {
+        type: 'doughnut',
+        data: {
+            labels: parroquiasLabels,
+            datasets: [{
+                data: parroquiasData,
+                backgroundColor: [
+                    '#1e3a8a',
+                    '#2563eb',
+                    '#10b981',
+                    '#f59e0b',
+                    '#8b5cf6',
+                    '#ec4899',
+                    '#06b6d4'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 14, font: { size: 11 } }
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

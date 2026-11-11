@@ -29,7 +29,7 @@ public class EntregaRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntregaResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<EntregaResponseDTO> buscarPorId(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(
                 entregaService.findById(id)
@@ -44,7 +44,7 @@ public class EntregaRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
         entregaService.delete(id);
         return ResponseEntity.noContent().build();
     }

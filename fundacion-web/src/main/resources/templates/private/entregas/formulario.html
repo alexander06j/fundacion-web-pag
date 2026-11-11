@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(${titulo})}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="${titulo}">Registrar Entrega</h1>
+
+        <a th:href="@{/dashboard/entregas}" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <!-- Mensaje de error general si ocurre stock insuficiente -->
+    <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
+        <span th:text="${errorMensaje}"></span>
+    </div>
+
+    <div class="card">
+        <form th:action="@{/dashboard/entregas}" th:object="${entrega}" method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+                    <label>Beneficiario</label>
+                    <select th:field="*{beneficiarioId}" class="form-control" required>
+                        <option value="">-- Seleccione un beneficiario --</option>
+                        <option th:each="b : ${beneficiarios}"
+                                th:value="${b.id}"
+                                th:text="${b.nombre + ' ' + b.apellido + ' (' + b.cedula + ') - ' + b.parroquiaNombre}">
+                        </option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('beneficiarioId')}" th:errors="*{beneficiarioId}"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Producto a Entregar</label>
+                    <select th:field="*{detalles[0].productoId}" class="form-control" required>
+                        <option value="">-- Seleccione un producto --</option>
+                        <option th:each="p : ${productos}"
+                                th:value="${p.id}"
+                                th:text="${p.nombre + ' (Stock disponible: ' + p.stock + ')'}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" min="1" value="1" th:field="*{detalles[0].cantidad}" class="form-control" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Observaciones / Detalle</label>
+                    <textarea rows="3" th:field="*{observacion}" class="form-control" placeholder="Detalle adicional sobre la entrega..."></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/dashboard/entregas}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Guardar Entrega</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
+

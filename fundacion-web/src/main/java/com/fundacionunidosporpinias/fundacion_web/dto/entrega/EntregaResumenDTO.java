@@ -1,5 +1,6 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.entrega;
 
+import com.fundacionunidosporpinias.fundacion_web.dto.AuditoriaDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EntregaResumenDTO {
+public class EntregaResumenDTO extends AuditoriaDTO {
 
     private Long id;
 

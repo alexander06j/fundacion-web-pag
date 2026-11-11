@@ -17,7 +17,10 @@ import com.fundacionunidosporpinias.fundacion_web.repository.EntregaRepository;
 import com.fundacionunidosporpinias.fundacion_web.repository.ProductoRepository;
 import com.fundacionunidosporpinias.fundacion_web.service.IEntregaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,6 +53,12 @@ public class EntregaService implements IEntregaService {
     }
 
     @Override
+    public Page<EntregaResumenDTO> buscarPaginado(String q, LocalDate desde, LocalDate hasta, Pageable pageable) {
+        String filtro = q == null ? "" : q.trim();
+        return entregaRepository.buscar(filtro, desde, hasta, pageable).map(resumenMapper::toResumenDTO);
+    }
+
+    @Override
     public EntregaResponseDTO findById(Long id) {
         Entrega entrega = entregaRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Entrega no encontrada"));
@@ -57,6 +66,7 @@ public class EntregaService implements IEntregaService {
     }
 
     @Override
+    @Transactional
     public EntregaResponseDTO registrarEntrega(EntregaRequestDTO dto) {
         Beneficiario beneficiario = beneficiarioRepository.findById(dto.getBeneficiarioId())
                 .orElseThrow(()-> new NotFoundException("Beneficiario no encontrado"));

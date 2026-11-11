@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head th:replace="~{fragments/head :: head('Parroquias')}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1>Gestión de Parroquias</h1>
+
+        <a th:if="${esAdmin}" th:href="@{/dashboard/parroquias/nuevo}" class="btn btn-primary">
+            ➕ Nueva Parroquia
+        </a>
+    </div>
+
+    <!-- Mensaje de error/alerta si ocurre restricción -->
+    <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
+        ⚠️ <span th:text="${errorMensaje}"></span>
+    </div>
+
+    <!-- Buscador / Filtro Rápido -->
+    <div class="card" style="margin-bottom: 20px; padding: 16px;">
+        <input type="text" id="buscadorTabla" class="form-control" placeholder="🔍 Buscar por nombre o cantón..."
+               onkeyup="filtrarTabla()">
+    </div>
+
+    <div class="card">
+        <div class="tabla-responsive">
+            <table class="tabla" id="tablaParroquias">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Cantón</th>
+                    <th>Auditoría</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="parroquia : ${parroquias}">
+                    <td th:text="${parroquia.id}"></td>
+                    <td th:text="${parroquia.nombre}"></td>
+                    <td>
+                        <span class="badge badge-success" th:text="${parroquia.canton}"></span>
+                    </td>
+                    <td>
+                        <div th:replace="~{fragments/auditoria :: celda(${parroquia})}"></div>
+                    </td>
+                    <td>
+                        <span th:unless="${esAdmin}" class="badge badge-neutral">Solo lectura</span>
+                        <div class="acciones" th:if="${esAdmin}">
+                            <a th:href="@{/dashboard/parroquias/{id}/editar(id=${parroquia.id})}"
+                               class="btn btn-primary">
+                                Editar
+                            </a>
+
+                            <form th:action="@{/dashboard/parroquias/{id}/eliminar(id=${parroquia.id})}"
+                                  method="post" th:attr="data-nombre=${parroquia.nombre}"
+                                  onsubmit="return confirmarEliminacion(this);">
+                                <button type="submit" class="btn btn-danger">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(parroquias)}">
+                    <td colspan="5">No existen parroquias registradas.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function confirmarEliminacion(form) {
+        const nombre = form.dataset.nombre;
+        return confirm(`¿Desea eliminar la parroquia "${nombre}"?\n\nEsta acción no se puede deshacer.`);
+    }
+
+    function filtrarTabla() {
+        const input = document.getElementById("buscadorTabla");
+        const filter = input.value.toLowerCase();
+        const filas = document.querySelectorAll("#tablaParroquias tbody tr");
+
+        filas.forEach(fila => {
+            const texto = fila.textContent.toLowerCase();
+            fila.style.display = texto.includes(filter) ? "" : "none";
+        });
+    }
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

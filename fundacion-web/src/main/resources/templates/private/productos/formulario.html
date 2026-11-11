@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head th:replace="~{fragments/head :: head(${titulo})}"></head>
+
+<body>
+<nav th:replace="~{fragments/navbar-admin :: navbar}"></nav>
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="${titulo}"></h1>
+
+        <a th:href="@{/dashboard/productos}" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <div class="card">
+        <form th:action="${modoEdicion}
+                ? @{/dashboard/productos/{id}(id=${productoId})}
+                : @{/dashboard/productos}"
+              th:object="${producto}"
+              method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Nombre del Producto</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej. Kit de Alimentos">
+                    <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Stock Disponible</label>
+                    <input type="number" min="0" th:field="*{stock}" class="form-control" placeholder="0">
+                    <small class="error" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></small>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Categoría</label>
+                    <input type="text" th:field="*{categoria}" class="form-control" placeholder="Ej. Alimentos, Medicina, Ropa">
+                    <small class="error" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></small>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Descripción</label>
+                    <textarea rows="4" th:field="*{descripcion}" class="form-control" placeholder="Descripción detallada del producto..."></textarea>
+                </div>
+
+            </div>
+
+            <div th:if="${modoEdicion}" th:replace="~{fragments/auditoria :: panel(${auditoria})}"></div>
+
+            <!-- Botones de acción alineados a la derecha -->
+            <div class="form-actions">
+                <a th:href="@{/dashboard/productos}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <span th:text="${modoEdicion} ? 'Actualizar Producto' : 'Guardar Producto'"></span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
