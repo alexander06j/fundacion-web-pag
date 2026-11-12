@@ -2,12 +2,12 @@ package com.fundacionunidosporpinias.fundacion_web.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +34,15 @@ public class Beneficiario extends Auditable {
 
     private String telefono;
     private String direccion;
+
+    private LocalDate fechaNacimiento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Sexo sexo;
+
+    @Column(length = 500)
+    private String detalles;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parroquia_id", nullable = false)

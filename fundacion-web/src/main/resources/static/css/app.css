@@ -770,6 +770,38 @@ body {
     color: #334155;
 }
 
+.badge-female {
+    background: #fce7f3;
+    color: #9d174d;
+}
+
+.search-filter-wrap {
+    flex: 0 1 170px;
+}
+
+.search-date-labeled {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 1 auto;
+}
+
+.search-date-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.cell-detalles {
+    min-width: 180px;
+    max-width: 320px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}
+
 @media (max-width: 900px) {
     .header-actions {
         width: 100%;
@@ -783,3 +815,4 @@ body {
         gap: 12px;
     }
 }
+

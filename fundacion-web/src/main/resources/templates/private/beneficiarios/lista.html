@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/head :: head('Beneficiarios')}"></head>
@@ -12,28 +11,52 @@
         <h1>Gestión de Beneficiarios</h1>
 
         <div class="header-actions">
-            <a th:href="@{/dashboard/beneficiarios/exportar/excel(q=${q})}" class="btn btn-excel"
+            <a th:href="@{/dashboard/beneficiarios/exportar/excel(q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
+               class="btn btn-excel"
                title="Descargar listado en formato Excel (.xlsx)">
-                 Exportar a Excel (XLSX)
+                Exportar a Excel (XLSX)
             </a>
 
             <a th:if="${puedeEditar}" th:href="@{/dashboard/beneficiarios/nuevo}" class="btn btn-primary">
-                ➕ Nuevo Beneficiario
+                Nuevo Beneficiario
             </a>
         </div>
     </div>
 
     <!-- Mensaje de error/alerta si ocurre restricción -->
     <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
-        ⚠️ <span th:text="${errorMensaje}"></span>
+        <span th:text="${errorMensaje}"></span>
     </div>
 
-    <!-- Buscador y Paginación en Servidor -->
+    <!-- Buscador por texto, sexo, fecha de nacimiento y paginación en servidor -->
     <div class="card" style="margin-bottom: 20px; padding: 16px;">
         <form th:action="@{/dashboard/beneficiarios}" method="get" class="search-toolbar">
             <div class="search-input-wrap">
                 <input type="text" name="q" th:value="${q}" class="form-control"
-                       placeholder="🔍 Buscar por nombre, apellido, cédula o parroquia...">
+                       placeholder="Buscar por nombre, apellido, cédula, parroquia o detalles...">
+            </div>
+
+            <div class="search-filter-wrap">
+                <select name="sexo" class="form-control" aria-label="Filtrar por sexo" onchange="this.form.submit()">
+                    <option value="">Todos los sexos</option>
+                    <option th:each="s : ${sexos}"
+                            th:value="${s.name()}"
+                            th:text="${s.descripcion}"
+                            th:selected="${sexo != null and sexo == s}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="search-date-labeled">
+                <span class="search-date-label">Nac. desde:</span>
+                <input type="date" name="desde" th:value="${desde}" class="form-control"
+                       title="Fecha de nacimiento desde" aria-label="Fecha de nacimiento desde">
+            </div>
+
+            <div class="search-date-labeled">
+                <span class="search-date-label">Nac. hasta:</span>
+                <input type="date" name="hasta" th:value="${hasta}" class="form-control"
+                       title="Fecha de nacimiento hasta" aria-label="Fecha de nacimiento hasta">
             </div>
 
             <div class="search-size-wrap">
@@ -47,7 +70,8 @@
 
             <div class="search-actions">
                 <button type="submit" class="btn btn-primary">Buscar</button>
-                <a th:if="${!#strings.isEmpty(q)}" th:href="@{/dashboard/beneficiarios(size=${size})}"
+                <a th:if="${!#strings.isEmpty(q) or sexo != null or desde != null or hasta != null}"
+                   th:href="@{/dashboard/beneficiarios(size=${size})}"
                    class="btn btn-secondary">
                     Limpiar
                 </a>
@@ -64,8 +88,14 @@
             <span th:if="${pagina.totalElements == 0}">
                     Sin coincidencias para la búsqueda actual.
                 </span>
-            <span th:if="${!#strings.isEmpty(q)}" class="badge badge-info" style="margin-left: 8px;"
-                  th:text="${'Filtro: ' + q}"></span>
+            <span th:if="${!#strings.isEmpty(q)}" class="badge badge-info"
+                  th:text="${'Texto: ' + q}"></span>
+            <span th:if="${sexo != null}" class="badge badge-info"
+                  th:text="${'Sexo: ' + sexo.descripcion}"></span>
+            <span th:if="${desde != null}" class="badge badge-info"
+                  th:text="${'Nac. desde: ' + #temporals.format(desde, 'dd/MM/yyyy')}"></span>
+            <span th:if="${hasta != null}" class="badge badge-info"
+                  th:text="${'Nac. hasta: ' + #temporals.format(hasta, 'dd/MM/yyyy')}"></span>
         </div>
     </div>
 
@@ -78,7 +108,10 @@
                     <th>Cédula</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
+                    <th>Sexo</th>
+                    <th>Fecha de Nacimiento</th>
                     <th>Teléfono</th>
+                    <th>Detalles</th>
                     <th>Parroquia</th>
                     <th>Auditoría</th>
                     <th>Acciones</th>
@@ -91,9 +124,17 @@
                     <td th:text="${beneficiario.cedula}"></td>
                     <td th:text="${beneficiario.nombre}"></td>
                     <td th:text="${beneficiario.apellido}"></td>
-                    <td
-                            th:text="${beneficiario.telefono != null and !beneficiario.telefono.isBlank() ? beneficiario.telefono : '-'}">
+                    <td>
+                                <span th:if="${beneficiario.sexo != null}"
+                                      th:class="${beneficiario.sexo.name() == 'MASCULINO' ? 'badge badge-info' : 'badge badge-female'}"
+                                      th:text="${beneficiario.sexo.descripcion}"></span>
+                        <span th:if="${beneficiario.sexo == null}" class="badge badge-neutral">-</span>
                     </td>
+                    <td th:text="${beneficiario.fechaNacimiento != null ? #temporals.format(beneficiario.fechaNacimiento, 'dd/MM/yyyy') : '-'}"></td>
+                    <td th:text="${beneficiario.telefono != null and !beneficiario.telefono.isBlank() ? beneficiario.telefono : '-'}"></td>
+                    <td class="cell-detalles"
+                        th:title="${beneficiario.detalles != null and !beneficiario.detalles.isBlank() ? beneficiario.detalles : ''}"
+                        th:text="${beneficiario.detalles != null and !beneficiario.detalles.isBlank() ? beneficiario.detalles : '-'}"></td>
                     <td>
                         <span class="badge badge-success" th:text="${beneficiario.parroquiaNombre}"></span>
                     </td>
@@ -122,7 +163,7 @@
                 </tr>
 
                 <tr th:if="${#lists.isEmpty(beneficiarios)}">
-                    <td colspan="8" style="text-align: center; color: #64748b; padding: 28px;">
+                    <td colspan="11" style="text-align: center; color: #64748b; padding: 28px;">
                         No se encontraron beneficiarios registrados.
                     </td>
                 </tr>
@@ -140,21 +181,23 @@
             <nav class="pagination-controls" aria-label="Paginación de beneficiarios">
                 <!-- Anterior -->
                 <a th:if="${pagina.hasPrevious()}"
-                   th:href="@{/dashboard/beneficiarios(page=${pagina.number - 1}, size=${size}, q=${q})}"
+                   th:href="@{/dashboard/beneficiarios(page=${pagina.number - 1}, size=${size}, q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
                    class="page-btn">
-                    « Anterior
+                    &laquo; Anterior
                 </a>
-                <span th:unless="${pagina.hasPrevious()}" class="page-btn disabled">« Anterior</span>
+                <span th:unless="${pagina.hasPrevious()}" class="page-btn disabled">&laquo; Anterior</span>
 
                 <!-- Salto rápido a página 1 si la ventana no la incluye -->
                 <th:block th:if="${!#lists.isEmpty(numerosPagina) and numerosPagina[0] > 0}">
-                    <a th:href="@{/dashboard/beneficiarios(page=0, size=${size}, q=${q})}" class="page-btn">1</a>
-                    <span th:if="${numerosPagina[0] > 1}" class="page-ellipsis">…</span>
+                    <a th:href="@{/dashboard/beneficiarios(page=0, size=${size}, q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
+                       class="page-btn">1</a>
+                    <span th:if="${numerosPagina[0] > 1}" class="page-ellipsis">&hellip;</span>
                 </th:block>
 
                 <!-- Ventana de páginas -->
                 <a th:each="num : ${numerosPagina}"
-                   th:href="@{/dashboard/beneficiarios(page=${num}, size=${size}, q=${q})}" th:text="${num + 1}"
+                   th:href="@{/dashboard/beneficiarios(page=${num}, size=${size}, q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
+                   th:text="${num + 1}"
                    th:class="${num == pagina.number} ? 'page-btn active' : 'page-btn'">
                 </a>
 
@@ -162,18 +205,18 @@
                 <th:block
                         th:if="${!#lists.isEmpty(numerosPagina) and numerosPagina[#lists.size(numerosPagina) - 1] < pagina.totalPages - 1}">
                         <span th:if="${numerosPagina[#lists.size(numerosPagina) - 1] < pagina.totalPages - 2}"
-                              class="page-ellipsis">…</span>
-                    <a th:href="@{/dashboard/beneficiarios(page=${pagina.totalPages - 1}, size=${size}, q=${q})}"
+                              class="page-ellipsis">&hellip;</span>
+                    <a th:href="@{/dashboard/beneficiarios(page=${pagina.totalPages - 1}, size=${size}, q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
                        th:text="${pagina.totalPages}" class="page-btn"></a>
                 </th:block>
 
                 <!-- Siguiente -->
                 <a th:if="${pagina.hasNext()}"
-                   th:href="@{/dashboard/beneficiarios(page=${pagina.number + 1}, size=${size}, q=${q})}"
+                   th:href="@{/dashboard/beneficiarios(page=${pagina.number + 1}, size=${size}, q=${q}, sexo=${sexo != null ? sexo.name() : null}, desde=${desde}, hasta=${hasta})}"
                    class="page-btn">
-                    Siguiente »
+                    Siguiente &raquo;
                 </a>
-                <span th:unless="${pagina.hasNext()}" class="page-btn disabled">Siguiente »</span>
+                <span th:unless="${pagina.hasNext()}" class="page-btn disabled">Siguiente &raquo;</span>
             </nav>
         </div>
     </div>

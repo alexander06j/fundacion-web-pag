@@ -2,6 +2,7 @@ package com.fundacionunidosporpinias.fundacion_web.controller.web;
 
 import com.fundacionunidosporpinias.fundacion_web.dto.beneficiario.BeneficiarioRequestDTO;
 import com.fundacionunidosporpinias.fundacion_web.dto.beneficiario.BeneficiarioResponseDTO;
+import com.fundacionunidosporpinias.fundacion_web.model.Sexo;
 import com.fundacionunidosporpinias.fundacion_web.service.IBeneficiarioService;
 import com.fundacionunidosporpinias.fundacion_web.service.IParroquiaService;
 import com.fundacionunidosporpinias.fundacion_web.service.IReporteService;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -42,10 +44,13 @@ public class BeneficiarioWebController {
     @Autowired
     private IReporteService reporteService;
 
-    // Lista de Beneficiarios con búsqueda y paginación en servidor
+    // Lista de Beneficiarios con búsqueda por texto, sexo y fecha de nacimiento
     @GetMapping
     public String listar(
             @RequestParam(name = "q", defaultValue = "") String q,
+            @RequestParam(name = "sexo", required = false) Sexo sexo,
+            @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(name = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             Model model) {
@@ -55,31 +60,36 @@ public class BeneficiarioWebController {
 
         Sort orden = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(paginaIdx, tamano, orden);
-        Page<BeneficiarioResponseDTO> pagina = beneficiarioService.buscarPaginado(filtro, pageable);
+        Page<BeneficiarioResponseDTO> pagina = beneficiarioService.buscarPaginado(filtro, sexo, desde, hasta, pageable);
 
-        // Si se eliminó el último registro de una página alta, retrocede a la última
-        // disponible
+        // Si se eliminó el último registro de una página alta, retrocede a la última disponible
         if (paginaIdx > 0 && pagina.getTotalPages() > 0 && paginaIdx >= pagina.getTotalPages()) {
             paginaIdx = pagina.getTotalPages() - 1;
-            pagina = beneficiarioService.buscarPaginado(filtro, PageRequest.of(paginaIdx, tamano, orden));
+            pagina = beneficiarioService.buscarPaginado(filtro, sexo, desde, hasta, PageRequest.of(paginaIdx, tamano, orden));
         }
 
         model.addAttribute("pagina", pagina);
         model.addAttribute("beneficiarios", pagina.getContent());
         model.addAttribute("q", filtro);
+        model.addAttribute("sexo", sexo);
+        model.addAttribute("sexos", Sexo.values());
+        model.addAttribute("desde", desde);
+        model.addAttribute("hasta", hasta);
         model.addAttribute("size", tamano);
         model.addAttribute("numerosPagina", calcularVentanaPaginas(pagina.getNumber(), pagina.getTotalPages()));
 
         return "private/beneficiarios/lista";
     }
 
-
-    // Exportación a Excel (.xlsx) respetando el filtro de búsqueda activo
+    // Exportación a Excel (.xlsx) respetando los filtros activos
     @GetMapping("/exportar/excel")
     public ResponseEntity<byte[]> exportarExcel(
-            @RequestParam(name = "q", defaultValue = "") String q
+            @RequestParam(name = "q", defaultValue = "") String q,
+            @RequestParam(name = "sexo", required = false) Sexo sexo,
+            @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(name = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
     ) {
-        byte[] archivo = reporteService.exportarBeneficiariosExcel(q);
+        byte[] archivo = reporteService.exportarBeneficiariosExcel(q, sexo, desde, hasta);
         String nombreArchivo = "beneficiarios_" + LocalDate.now() + ".xlsx";
 
         HttpHeaders headers = new HttpHeaders();
@@ -99,9 +109,7 @@ public class BeneficiarioWebController {
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
         model.addAttribute("beneficiario", new BeneficiarioRequestDTO());
-        model.addAttribute("parroquias", parroquiaService.findAll());
-        model.addAttribute("titulo", "Registrar beneficiario");
-        model.addAttribute("modoEdicion", false);
+        prepararFormulario(model, "Registrar beneficiario", false, null, null);
 
         return "private/beneficiarios/formulario";
     }
@@ -114,9 +122,7 @@ public class BeneficiarioWebController {
             Model model
     ) {
         if (result.hasErrors()) {
-            model.addAttribute("titulo", "Registrar beneficiario");
-            model.addAttribute("modoEdicion", false);
-            model.addAttribute("parroquias", parroquiaService.findAll());
+            prepararFormulario(model, "Registrar beneficiario", false, null, null);
             return "private/beneficiarios/formulario";
         }
 
@@ -141,14 +147,13 @@ public class BeneficiarioWebController {
         dto.setApellido(response.getApellido());
         dto.setTelefono(response.getTelefono());
         dto.setDireccion(response.getDireccion());
+        dto.setFechaNacimiento(response.getFechaNacimiento());
+        dto.setSexo(response.getSexo());
+        dto.setDetalles(response.getDetalles());
         dto.setParroquiaId(response.getParroquiaId());
 
         model.addAttribute("beneficiario", dto);
-        model.addAttribute("auditoria", response);
-        model.addAttribute("beneficiarioId", id);
-        model.addAttribute("parroquias", parroquiaService.findAll());
-        model.addAttribute("titulo", "Editar beneficiario");
-        model.addAttribute("modoEdicion", true);
+        prepararFormulario(model, "Editar beneficiario", true, id, response);
 
         return "private/beneficiarios/formulario";
     }
@@ -162,11 +167,7 @@ public class BeneficiarioWebController {
             Model model
     ) {
         if (result.hasErrors()) {
-            model.addAttribute("beneficiarioId", id);
-            model.addAttribute("auditoria", beneficiarioService.findById(id));
-            model.addAttribute("titulo", "Editar beneficiario");
-            model.addAttribute("modoEdicion", true);
-            model.addAttribute("parroquias", parroquiaService.findAll());
+            prepararFormulario(model, "Editar beneficiario", true, id, beneficiarioService.findById(id));
             return "private/beneficiarios/formulario";
         }
 
@@ -176,7 +177,6 @@ public class BeneficiarioWebController {
 
     // Eliminar beneficiario
     @PostMapping("/{id}/eliminar")
-
     public String eliminar(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             beneficiarioService.delete(id);
@@ -186,6 +186,23 @@ public class BeneficiarioWebController {
         }
 
         return "redirect:/dashboard/beneficiarios";
+    }
+
+    private void prepararFormulario(Model model,
+                                    String titulo,
+                                    boolean modoEdicion,
+                                    Long beneficiarioId,
+                                    BeneficiarioResponseDTO auditoria) {
+        model.addAttribute("titulo", titulo);
+        model.addAttribute("modoEdicion", modoEdicion);
+        model.addAttribute("parroquias", parroquiaService.findAll());
+        model.addAttribute("sexos", Sexo.values());
+        if (beneficiarioId != null) {
+            model.addAttribute("beneficiarioId", beneficiarioId);
+        }
+        if (auditoria != null) {
+            model.addAttribute("auditoria", auditoria);
+        }
     }
 
     static List<Integer> calcularVentanaPaginas(int paginaActual, int totalPaginas) {
