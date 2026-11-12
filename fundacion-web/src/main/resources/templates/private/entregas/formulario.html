@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/head :: head(${titulo})}"></head>
@@ -16,19 +15,27 @@
         </a>
     </div>
 
-    <!-- Mensaje de error general si ocurre stock insuficiente -->
+    <!-- Mensaje de error general (stock insuficiente, producto repetido, etc.) -->
     <div th:if="${errorMensaje}" class="error-alert" style="margin-bottom: 20px;">
         <span th:text="${errorMensaje}"></span>
     </div>
 
+    <!-- Aviso si no hay productos con stock o beneficiarios registrados -->
+    <div th:if="${#lists.isEmpty(beneficiarios)}" class="warning-alert" style="margin-bottom: 20px;">
+        No existen beneficiarios registrados. Registre un beneficiario antes de crear una entrega.
+    </div>
+    <div th:if="${!hayProductosConStock}" class="warning-alert" style="margin-bottom: 20px;">
+        No hay productos con stock disponible en inventario. Reabastezca algún producto para registrar entregas.
+    </div>
+
     <div class="card">
-        <form th:action="@{/dashboard/entregas}" th:object="${entrega}" method="post">
+        <form th:action="@{/dashboard/entregas}" th:object="${entrega}" method="post" id="formEntrega">
 
             <div class="form-grid">
 
                 <div class="form-group full-width">
-                    <label>Beneficiario</label>
-                    <select th:field="*{beneficiarioId}" class="form-control" required>
+                    <label for="beneficiarioId">Beneficiario</label>
+                    <select id="beneficiarioId" th:field="*{beneficiarioId}" class="form-control" required>
                         <option value="">-- Seleccione un beneficiario --</option>
                         <option th:each="b : ${beneficiarios}"
                                 th:value="${b.id}"
@@ -38,38 +45,314 @@
                     <small class="error" th:if="${#fields.hasErrors('beneficiarioId')}" th:errors="*{beneficiarioId}"></small>
                 </div>
 
-                <div class="form-group">
-                    <label>Producto a Entregar</label>
-                    <select th:field="*{detalles[0].productoId}" class="form-control" required>
-                        <option value="">-- Seleccione un producto --</option>
-                        <option th:each="p : ${productos}"
-                                th:value="${p.id}"
-                                th:text="${p.nombre + ' (Stock disponible: ' + p.stock + ')'}">
-                        </option>
-                    </select>
-                </div>
+                <!-- Sección dinámica de múltiples productos -->
+                <div class="form-group full-width detalle-productos-section">
+                    <div class="detalle-header">
+                        <div>
+                            <h3>Productos a Entregar</h3>
+                            <small>Agregue uno o varios productos distintos indicando la cantidad de cada uno.</small>
+                        </div>
+                        <button type="button" id="btnAgregarProducto" class="btn btn-primary btn-sm">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            <span>Agregar Producto</span>
+                        </button>
+                    </div>
 
-                <div class="form-group">
-                    <label>Cantidad</label>
-                    <input type="number" min="1" value="1" th:field="*{detalles[0].cantidad}" class="form-control" required>
+                    <small class="error" th:if="${#fields.hasErrors('detalles')}" th:errors="*{detalles}" style="margin-bottom: 10px;"></small>
+
+                    <div class="detalle-table-wrap">
+                        <table class="tabla tabla-detalles">
+                            <thead>
+                            <tr>
+                                <th class="col-producto">Producto</th>
+                                <th class="col-stock">Stock Disponible</th>
+                                <th class="col-cantidad">Cantidad</th>
+                                <th class="col-accion">Acción</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyDetalles">
+                            <tr class="fila-detalle" th:each="det, stat : *{detalles}">
+                                <td>
+                                    <select class="form-control select-producto"
+                                            th:name="|detalles[${stat.index}].productoId|"
+                                            required>
+                                        <option value="">-- Seleccione un producto --</option>
+                                        <option th:each="p : ${productos}"
+                                                th:value="${p.id}"
+                                                th:data-stock="${p.stock}"
+                                                th:data-label="${p.stock != null and p.stock > 0 ? p.nombre : p.nombre + ' (Sin stock)'}"
+                                                th:selected="${det.productoId != null and det.productoId == p.id}"
+                                                th:disabled="${p.stock == null or p.stock <= 0}"
+                                                th:text="${p.stock != null and p.stock > 0 ? p.nombre : p.nombre + ' (Sin stock)'}">
+                                        </option>
+                                    </select>
+                                    <small class="error"
+                                           th:if="${#fields.hasErrors('detalles[' + stat.index + '].productoId')}"
+                                           th:errors="*{detalles[__${stat.index}__].productoId}"></small>
+                                </td>
+                                <td class="col-stock">
+                                    <span class="badge badge-neutral stock-badge">-</span>
+                                </td>
+                                <td>
+                                    <input type="number"
+                                           min="1"
+                                           step="1"
+                                           class="form-control input-cantidad"
+                                           th:name="|detalles[${stat.index}].cantidad|"
+                                           th:value="${det.cantidad != null ? det.cantidad : 1}"
+                                           required>
+                                    <small class="error"
+                                           th:if="${#fields.hasErrors('detalles[' + stat.index + '].cantidad')}"
+                                           th:errors="*{detalles[__${stat.index}__].cantidad}"></small>
+                                </td>
+                                <td class="col-accion">
+                                    <button type="button" class="btn btn-danger btn-sm btn-quitar-fila">
+                                        Quitar
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="detalle-resumen">
+                            <span>Productos distintos: <strong id="resumenProductos">0</strong></span>
+                            <span>Total de unidades: <strong id="resumenUnidades">0</strong></span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group full-width">
-                    <label>Observaciones / Detalle</label>
-                    <textarea rows="3" th:field="*{observacion}" class="form-control" placeholder="Detalle adicional sobre la entrega..."></textarea>
+                    <label for="observacion">Observaciones / Detalle</label>
+                    <textarea id="observacion" rows="3" th:field="*{observacion}" class="form-control"
+                              placeholder="Detalle adicional sobre la entrega..."></textarea>
                 </div>
 
             </div>
 
             <div class="form-actions">
                 <a th:href="@{/dashboard/entregas}" class="btn btn-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-success">Guardar Entrega</button>
+                <button type="submit" class="btn btn-success"
+                        th:disabled="${#lists.isEmpty(beneficiarios) or !hayProductosConStock}">
+                    Guardar Entrega
+                </button>
             </div>
 
         </form>
     </div>
 
 </div>
+
+<!-- Plantilla oculta para clonar nuevas líneas de producto -->
+<template id="tplFilaDetalle">
+    <tr class="fila-detalle">
+        <td>
+            <select class="form-control select-producto" name="detalles[0].productoId" required>
+                <option value="">-- Seleccione un producto --</option>
+                <option th:each="p : ${productos}"
+                        th:value="${p.id}"
+                        th:data-stock="${p.stock}"
+                        th:data-label="${p.stock != null and p.stock > 0 ? p.nombre : p.nombre + ' (Sin stock)'}"
+                        th:disabled="${p.stock == null or p.stock <= 0}"
+                        th:text="${p.stock != null and p.stock > 0 ? p.nombre : p.nombre + ' (Sin stock)'}">
+                </option>
+            </select>
+        </td>
+        <td class="col-stock">
+            <span class="badge badge-neutral stock-badge">-</span>
+        </td>
+        <td>
+            <input type="number" min="1" step="1" class="form-control input-cantidad"
+                   name="detalles[0].cantidad" value="1" required>
+        </td>
+        <td class="col-accion">
+            <button type="button" class="btn btn-danger btn-sm btn-quitar-fila">
+                Quitar
+            </button>
+        </td>
+    </tr>
+</template>
+
+<script>
+    (function () {
+        const tbody = document.getElementById('tbodyDetalles');
+        const btnAgregar = document.getElementById('btnAgregarProducto');
+        const template = document.getElementById('tplFilaDetalle');
+        const form = document.getElementById('formEntrega');
+        const resumenProductos = document.getElementById('resumenProductos');
+        const resumenUnidades = document.getElementById('resumenUnidades');
+
+        if (!tbody || !btnAgregar || !template || !form) {
+            return;
+        }
+
+        function obtenerFilas() {
+            return Array.from(tbody.querySelectorAll('tr.fila-detalle'));
+        }
+
+        function reindexarFilas() {
+            const filas = obtenerFilas();
+            filas.forEach((fila, idx) => {
+                const select = fila.querySelector('.select-producto');
+                const input = fila.querySelector('.input-cantidad');
+                const btnQuitar = fila.querySelector('.btn-quitar-fila');
+
+                if (select) {
+                    select.name = 'detalles[' + idx + '].productoId';
+                }
+                if (input) {
+                    input.name = 'detalles[' + idx + '].cantidad';
+                }
+                if (btnQuitar) {
+                    btnQuitar.disabled = filas.length <= 1;
+                }
+            });
+        }
+
+        function actualizarStockFila(fila) {
+            const select = fila.querySelector('.select-producto');
+            const badge = fila.querySelector('.stock-badge');
+            const input = fila.querySelector('.input-cantidad');
+            if (!select || !badge || !input) return;
+
+            const opcion = select.options[select.selectedIndex];
+            if (opcion && opcion.value !== '') {
+                const stock = parseInt(opcion.getAttribute('data-stock') || '0', 10);
+                badge.textContent = stock + ' uds.';
+                badge.className = 'badge stock-badge ' + (stock < 10 ? 'badge-danger' : 'badge-success');
+                if (stock > 0) {
+                    input.max = stock;
+                } else {
+                    input.removeAttribute('max');
+                }
+            } else {
+                badge.textContent = '-';
+                badge.className = 'badge badge-neutral stock-badge';
+                input.removeAttribute('max');
+            }
+        }
+
+        function actualizarOpcionesDisponibles() {
+            const filas = obtenerFilas();
+            const selects = filas.map(f => f.querySelector('.select-producto')).filter(Boolean);
+            const seleccionados = selects.map(s => s.value).filter(v => v !== '');
+
+            let disponiblesConStock = 0;
+
+            selects.forEach((select, idxSelect) => {
+                const valorPropio = select.value;
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === '') return;
+
+                    const stock = parseInt(opt.getAttribute('data-stock') || '0', 10);
+                    const labelBase = opt.getAttribute('data-label') || opt.textContent;
+                    if (idxSelect === 0 && stock > 0) {
+                        disponiblesConStock++;
+                    }
+
+                    const usadoEnOtraFila = seleccionados.includes(opt.value) && opt.value !== valorPropio;
+                    if (stock <= 0) {
+                        opt.disabled = true;
+                        opt.textContent = labelBase;
+                    } else if (usadoEnOtraFila) {
+                        opt.disabled = true;
+                        opt.textContent = labelBase + ' (Ya agregado)';
+                    } else {
+                        opt.disabled = false;
+                        opt.textContent = labelBase;
+                    }
+                });
+            });
+
+            if (disponiblesConStock === 0 || filas.length >= disponiblesConStock) {
+                btnAgregar.disabled = true;
+                btnAgregar.title = disponiblesConStock === 0
+                    ? 'No hay productos con stock disponible'
+                    : 'Ya se han agregado todos los productos disponibles';
+            } else {
+                btnAgregar.disabled = false;
+                btnAgregar.title = '';
+            }
+        }
+
+        function actualizarResumen() {
+            const filas = obtenerFilas();
+            let productosCount = 0;
+            let unidadesTotal = 0;
+
+            filas.forEach(fila => {
+                const select = fila.querySelector('.select-producto');
+                const input = fila.querySelector('.input-cantidad');
+                if (select && select.value !== '') {
+                    productosCount++;
+                    const cant = parseInt(input ? input.value : '0', 10);
+                    if (!isNaN(cant) && cant > 0) {
+                        unidadesTotal += cant;
+                    }
+                }
+            });
+
+            if (resumenProductos) resumenProductos.textContent = String(productosCount);
+            if (resumenUnidades) resumenUnidades.textContent = String(unidadesTotal);
+        }
+
+        function vincularEventosFila(fila) {
+            const select = fila.querySelector('.select-producto');
+            const input = fila.querySelector('.input-cantidad');
+            const btnQuitar = fila.querySelector('.btn-quitar-fila');
+
+            if (select) {
+                select.addEventListener('change', () => {
+                    actualizarStockFila(fila);
+                    actualizarOpcionesDisponibles();
+                    actualizarResumen();
+                });
+            }
+
+            if (input) {
+                input.addEventListener('input', actualizarResumen);
+            }
+
+            if (btnQuitar) {
+                btnQuitar.addEventListener('click', () => {
+                    if (obtenerFilas().length <= 1) return;
+                    fila.remove();
+                    reindexarFilas();
+                    actualizarOpcionesDisponibles();
+                    actualizarResumen();
+                });
+            }
+        }
+
+        btnAgregar.addEventListener('click', () => {
+            const clon = template.content.cloneNode(true);
+            const nuevaFila = clon.querySelector('tr.fila-detalle');
+            if (!nuevaFila) return;
+
+            tbody.appendChild(nuevaFila);
+            vincularEventosFila(nuevaFila);
+            reindexarFilas();
+            actualizarStockFila(nuevaFila);
+            actualizarOpcionesDisponibles();
+            actualizarResumen();
+        });
+
+        form.addEventListener('submit', () => {
+            reindexarFilas();
+        });
+
+        // Inicialización de filas existentes (alta nueva o retorno por error de validación)
+        obtenerFilas().forEach(fila => {
+            vincularEventosFila(fila);
+            actualizarStockFila(fila);
+        });
+        reindexarFilas();
+        actualizarOpcionesDisponibles();
+        actualizarResumen();
+    })();
+</script>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>

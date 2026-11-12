@@ -23,8 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EntregaService implements IEntregaService {
@@ -65,39 +64,35 @@ public class EntregaService implements IEntregaService {
         return entregaMapper.toResponseDTO(entrega);
     }
 
+    // Transaccional: valida todos los productos antes de guardar y revierte si falla alguno.
     @Override
     @Transactional
     public EntregaResponseDTO registrarEntrega(EntregaRequestDTO dto) {
+        if (dto == null || dto.getBeneficiarioId() == null) {
+            throw new IllegalArgumentException("Debe seleccionar un beneficiario.");
+        }
+
         Beneficiario beneficiario = beneficiarioRepository.findById(dto.getBeneficiarioId())
-                .orElseThrow(()-> new NotFoundException("Beneficiario no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Beneficiario no encontrado"));
+
+        List<ProductoCantidad> itemsValidados = validarDetalles(dto.getDetalles());
 
         Entrega entrega = new Entrega();
-
         entrega.setFechaEntrega(LocalDate.now());
         entrega.setObservacion(dto.getObservacion());
         entrega.setBeneficiario(beneficiario);
-
         entrega = entregaRepository.save(entrega);
 
         List<DetalleEntrega> detalles = new ArrayList<>();
-
-        for (DetalleEntregaRequestDTO detalleDto : dto.getDetalles()){
-            Producto producto = productoRepository.findById(detalleDto.getProductoId())
-                    .orElseThrow(()-> new NotFoundException("Producto no encontrado"));
-
-            if(producto.getStock() < detalleDto.getCantidad()){
-                throw new NotFoundException("Stock insuficiente para: " + producto.getNombre());
-            }
-            producto.setStock(producto.getStock() - detalleDto.getCantidad());
-
+        for (ProductoCantidad item : itemsValidados) {
+            Producto producto = item.producto();
+            producto.setStock(producto.getStock() - item.cantidad());
             productoRepository.save(producto);
 
             DetalleEntrega detalle = new DetalleEntrega();
-
             detalle.setEntrega(entrega);
             detalle.setProducto(producto);
-            detalle.setCantidad(detalleDto.getCantidad());
-
+            detalle.setCantidad(item.cantidad());
             detalleRepository.save(detalle);
 
             detalles.add(detalle);
@@ -105,6 +100,51 @@ public class EntregaService implements IEntregaService {
 
         entrega.setDetalles(detalles);
         return entregaMapper.toResponseDTO(entrega);
+    }
+
+    private List<ProductoCantidad> validarDetalles(List<DetalleEntregaRequestDTO> detallesDto) {
+        List<DetalleEntregaRequestDTO> detallesValidos = detallesDto == null
+                ? List.of()
+                : detallesDto.stream().filter(Objects::nonNull).toList();
+
+        if (detallesValidos.isEmpty()) {
+            throw new IllegalArgumentException("Debe agregar al menos un producto a la entrega.");
+        }
+
+        Set<Long> productosVistos = new HashSet<>();
+        List<ProductoCantidad> resultado = new ArrayList<>(detallesValidos.size());
+
+        for (DetalleEntregaRequestDTO detalleDto : detallesValidos) {
+            if (detalleDto.getProductoId() == null) {
+                throw new IllegalArgumentException("Todos los ítems deben tener un producto seleccionado.");
+            }
+            if (detalleDto.getCantidad() == null || detalleDto.getCantidad() < 1) {
+                throw new IllegalArgumentException("La cantidad de cada producto debe ser al menos 1.");
+            }
+
+            Producto producto = productoRepository.findById(detalleDto.getProductoId())
+                    .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
+
+            if (!productosVistos.add(producto.getId())) {
+                throw new IllegalArgumentException(
+                        "El producto \"" + producto.getNombre()
+                                + "\" está repetido en la entrega. Ajuste la cantidad en una sola línea.");
+            }
+
+            int stockActual = producto.getStock() != null ? producto.getStock() : 0;
+            if (stockActual < detalleDto.getCantidad()) {
+                throw new IllegalStateException(
+                        "Stock insuficiente para \"" + producto.getNombre()
+                                + "\" (disponible: " + stockActual + ", solicitado: " + detalleDto.getCantidad() + ").");
+            }
+
+            resultado.add(new ProductoCantidad(producto, detalleDto.getCantidad()));
+        }
+
+        return resultado;
+    }
+
+    private record ProductoCantidad(Producto producto, int cantidad) {
     }
 
     @Override
