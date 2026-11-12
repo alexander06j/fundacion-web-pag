@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
 public class ProductoService implements IProductoService {
 
@@ -51,6 +52,7 @@ public class ProductoService implements IProductoService {
         producto.setStock(dto.getStock());
         producto.setDescripcion(dto.getDescripcion());
         producto.setCategoria(dto.getCategoria());
+        producto.setOrigen(dto.getOrigen());
 
         return mapper.toResponseDTO(
                 repository.save(producto)

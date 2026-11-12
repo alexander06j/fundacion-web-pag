@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<meta charset="UTF-8">
+
 <head th:replace="~{fragments/head :: head(${titulo})}"></head>
 
 <body>
@@ -25,26 +25,38 @@
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label>Nombre del Producto</label>
-                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej. Kit de Alimentos">
+                    <label for="nombre">Nombre del Producto</label>
+                    <input id="nombre" type="text" th:field="*{nombre}" class="form-control" placeholder="Ej. Kit de Alimentos" required>
                     <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
                 </div>
 
                 <div class="form-group">
-                    <label>Stock Disponible</label>
-                    <input type="number" min="0" th:field="*{stock}" class="form-control" placeholder="0">
+                    <label for="stock">Stock Disponible</label>
+                    <input id="stock" type="number" min="0" th:field="*{stock}" class="form-control" placeholder="0" required>
                     <small class="error" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></small>
                 </div>
 
-                <div class="form-group full-width">
-                    <label>Categoría</label>
-                    <input type="text" th:field="*{categoria}" class="form-control" placeholder="Ej. Alimentos, Medicina, Ropa">
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <input id="categoria" type="text" th:field="*{categoria}" class="form-control" placeholder="Ej. Alimentos, Medicina, Ropa" required>
                     <small class="error" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></small>
                 </div>
 
+                <div class="form-group">
+                    <label for="origen">Origen del Producto</label>
+                    <select id="origen" th:field="*{origen}" class="form-control" required>
+                        <option value="">-- Seleccione el origen --</option>
+                        <option th:each="o : ${origenes}"
+                                th:value="${o.name()}"
+                                th:text="${o.descripcion + (o.name() == 'DONADO' ? ' (Donado a la fundación)' : ' (Comprado por la fundación)')}">
+                        </option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('origen')}" th:errors="*{origen}"></small>
+                </div>
+
                 <div class="form-group full-width">
-                    <label>Descripción</label>
-                    <textarea rows="4" th:field="*{descripcion}" class="form-control" placeholder="Descripción detallada del producto..."></textarea>
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" rows="4" th:field="*{descripcion}" class="form-control" placeholder="Descripción detallada del producto..."></textarea>
                 </div>
 
             </div>
