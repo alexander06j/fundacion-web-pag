@@ -1,5 +1,6 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.entrega;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,12 +16,13 @@ import java.util.List;
 @Setter
 public class EntregaRequestDTO {
 
-    @NotNull
+    @NotNull(message = "Debe seleccionar un beneficiario.")
     private Long beneficiarioId;
 
     private String observacion;
 
-    @NotEmpty
+    @Valid
+    @NotEmpty(message = "Debe agregar al menos un producto a la entrega.")
     private List<DetalleEntregaRequestDTO> detalles;
 
 }

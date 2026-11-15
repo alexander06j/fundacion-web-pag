@@ -4,6 +4,7 @@ import com.fundacionunidosporpinias.fundacion_web.dto.entrega.DetalleEntregaRequ
 import com.fundacionunidosporpinias.fundacion_web.dto.entrega.EntregaRequestDTO;
 import com.fundacionunidosporpinias.fundacion_web.dto.entrega.EntregaResponseDTO;
 import com.fundacionunidosporpinias.fundacion_web.dto.entrega.EntregaResumenDTO;
+import com.fundacionunidosporpinias.fundacion_web.dto.producto.ProductoResponseDTO;
 import com.fundacionunidosporpinias.fundacion_web.service.IBeneficiarioService;
 import com.fundacionunidosporpinias.fundacion_web.service.IEntregaService;
 import com.fundacionunidosporpinias.fundacion_web.service.IProductoService;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/dashboard/entregas")
@@ -144,6 +146,8 @@ public class EntregaWebController {
         detalles.add(new DetalleEntregaRequestDTO());
         entregaDTO.setDetalles(detalles);
 
+        cargarDatosFormulario(model, entregaDTO);
+
         model.addAttribute("entrega", entregaDTO);
         model.addAttribute("beneficiarios", beneficiarioService.findAll());
         model.addAttribute("productos", productoService.findAll());
@@ -162,6 +166,7 @@ public class EntregaWebController {
             model.addAttribute("titulo", "Registrar Entrega");
             model.addAttribute("beneficiarios", beneficiarioService.findAll());
             model.addAttribute("productos", productoService.findAll());
+            cargarDatosFormulario(model, entregaDTO);
             return "private/entregas/formulario";
         }
 
@@ -171,11 +176,34 @@ public class EntregaWebController {
             model.addAttribute("titulo", "Registrar Entrega");
             model.addAttribute("beneficiarios", beneficiarioService.findAll());
             model.addAttribute("productos", productoService.findAll());
+            cargarDatosFormulario(model, entregaDTO);
             model.addAttribute("errorMensaje", e.getMessage());
             return "private/entregas/formulario";
         }
 
         return "redirect:/dashboard/entregas";
+    }
+
+    private void cargarDatosFormulario(Model model, EntregaRequestDTO entregaDTO) {
+        List<DetalleEntregaRequestDTO> detallesLimpios = new ArrayList<>();
+        if (entregaDTO.getDetalles() != null) {
+            entregaDTO.getDetalles().stream()
+                    .filter(Objects::nonNull)
+                    .forEach(detallesLimpios::add);
+        }
+        if (detallesLimpios.isEmpty()) {
+            detallesLimpios.add(new DetalleEntregaRequestDTO());
+        }
+        entregaDTO.setDetalles(detallesLimpios);
+
+        List<ProductoResponseDTO> productos = productoService.findAll();
+        boolean hayProductosConStock = productos.stream()
+                .anyMatch(p -> p.getStock() != null && p.getStock() > 0);
+
+        model.addAttribute("titulo", "Registrar Entrega");
+        model.addAttribute("beneficiarios", beneficiarioService.findAll());
+        model.addAttribute("productos", productos);
+        model.addAttribute("hayProductosConStock", hayProductosConStock);
     }
 
     // Eliminar entrega

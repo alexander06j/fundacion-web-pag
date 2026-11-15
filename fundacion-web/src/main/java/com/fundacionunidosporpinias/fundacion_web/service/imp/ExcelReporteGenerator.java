@@ -1,9 +1,6 @@
 package com.fundacionunidosporpinias.fundacion_web.service.imp;
 
-import com.fundacionunidosporpinias.fundacion_web.model.Beneficiario;
-import com.fundacionunidosporpinias.fundacion_web.model.DetalleEntrega;
-import com.fundacionunidosporpinias.fundacion_web.model.Entrega;
-import com.fundacionunidosporpinias.fundacion_web.model.Parroquia;
+import com.fundacionunidosporpinias.fundacion_web.model.*;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -43,6 +40,15 @@ public class ExcelReporteGenerator {
     public byte[] generarBeneficiariosXlsx(List<Beneficiario> beneficiarios,
                                            Map<Long, Long> entregasPorBeneficiario,
                                            String filtro) {
+        return generarBeneficiariosXlsx(beneficiarios, entregasPorBeneficiario, filtro, null, null, null);
+    }
+
+    public byte[] generarBeneficiariosXlsx(List<Beneficiario> beneficiarios,
+                                           Map<Long, Long> entregasPorBeneficiario,
+                                           String filtro,
+                                           Sexo sexo,
+                                           LocalDate desde,
+                                           LocalDate hasta) {
         try (XSSFWorkbook wb = new XSSFWorkbook();
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
@@ -50,14 +56,18 @@ public class ExcelReporteGenerator {
             Sheet sheet = wb.createSheet("Beneficiarios");
 
             String[] columnas = {
-                    "ID", "Cédula", "Nombres", "Apellidos", "Teléfono", "Dirección",
-                    "Parroquia", "Cantón", "Entregas Recibidas",
+                    "ID", "Cédula", "Nombres", "Apellidos", "Sexo", "Fecha Nacimiento",
+                    "Teléfono", "Dirección", "Detalles", "Parroquia", "Cantón", "Entregas Recibidas",
                     "Creado Por", "Fecha Creación", "Modificado Por", "Última Modificación"
             };
 
-            String detalleFiltro = (filtro != null && !filtro.isBlank())
-                    ? "Búsqueda: \"" + filtro + "\""
-                    : "Todos los registros";
+            String detalleFiltro = construirDescripcionFiltros(
+                    filtro,
+                    sexo != null ? "Sexo: " + sexo.getDescripcion() : null,
+                    "Nacimiento",
+                    desde,
+                    hasta
+            );
             crearEncabezadoHoja(
                     sheet,
                     "FUNDACIÓN UNIDOS POR PIÑAS — PADRÓN DE BENEFICIARIOS",
@@ -85,15 +95,18 @@ public class ExcelReporteGenerator {
                 setCeldaTexto(row, 1, b.getCedula(), estiloCentro);
                 setCeldaTexto(row, 2, b.getNombre(), estiloTexto);
                 setCeldaTexto(row, 3, b.getApellido(), estiloTexto);
-                setCeldaTexto(row, 4, valorOGuion(b.getTelefono()), estiloCentro);
-                setCeldaTexto(row, 5, valorOGuion(b.getDireccion()), estiloTexto);
-                setCeldaTexto(row, 6, p != null ? p.getNombre() : "-", estiloTexto);
-                setCeldaTexto(row, 7, p != null ? p.getCanton() : "-", estiloTexto);
-                setCeldaNumero(row, 8, numEntregas, estiloCentro);
-                setCeldaTexto(row, 9, valorOGuion(b.getCreadoPor()), estiloCentro);
-                setCeldaTexto(row, 10, formatearFechaHora(b.getFechaCreacion()), estiloCentro);
-                setCeldaTexto(row, 11, valorOGuion(b.getModificadoPor()), estiloCentro);
-                setCeldaTexto(row, 12, formatearFechaHora(b.getFechaModificacion()), estiloCentro);
+                setCeldaTexto(row, 4, b.getSexo() != null ? b.getSexo().getDescripcion() : "-", estiloCentro);
+                setCeldaTexto(row, 5, b.getFechaNacimiento() != null ? b.getFechaNacimiento().format(FMT_FECHA) : "-", estiloCentro);
+                setCeldaTexto(row, 6, valorOGuion(b.getTelefono()), estiloCentro);
+                setCeldaTexto(row, 7, valorOGuion(b.getDireccion()), estiloTexto);
+                setCeldaTexto(row, 8, valorOGuion(b.getDetalles()), estiloTexto);
+                setCeldaTexto(row, 9, p != null ? p.getNombre() : "-", estiloTexto);
+                setCeldaTexto(row, 10, p != null ? p.getCanton() : "-", estiloTexto);
+                setCeldaNumero(row, 11, numEntregas, estiloCentro);
+                setCeldaTexto(row, 12, valorOGuion(b.getCreadoPor()), estiloCentro);
+                setCeldaTexto(row, 13, formatearFechaHora(b.getFechaCreacion()), estiloCentro);
+                setCeldaTexto(row, 14, valorOGuion(b.getModificadoPor()), estiloCentro);
+                setCeldaTexto(row, 15, formatearFechaHora(b.getFechaModificacion()), estiloCentro);
             }
 
             // Fila resumen
@@ -102,8 +115,8 @@ public class ExcelReporteGenerator {
                 setCeldaTexto(totalRow, c, "", estilos.resumen);
             }
             setCeldaTexto(totalRow, 0, "TOTAL BENEFICIARIOS: " + beneficiarios.size(), estilos.resumen);
-            sheet.addMergedRegion(new CellRangeAddress(filaIdx, filaIdx, 0, 7));
-            setCeldaNumero(totalRow, 8, sumaEntregas, estilos.resumenCentro);
+            sheet.addMergedRegion(new CellRangeAddress(filaIdx, filaIdx, 0, 10));
+            setCeldaNumero(totalRow, 11, sumaEntregas, estilos.resumenCentro);
 
             finalizarFormatoHoja(sheet, columnas.length, filaIdx - 1);
 
@@ -295,13 +308,25 @@ public class ExcelReporteGenerator {
     }
 
     private String construirDescripcionFiltroEntregas(String filtro, LocalDate desde, LocalDate hasta) {
+        return construirDescripcionFiltros(filtro, null, "Periodo", desde, hasta);
+    }
+
+    private String construirDescripcionFiltros(String filtro,
+                                               String filtroExtra,
+                                               String etiquetaPeriodo,
+                                               LocalDate desde,
+                                               LocalDate hasta) {
         StringBuilder sb = new StringBuilder();
         if (filtro != null && !filtro.isBlank()) {
             sb.append("Búsqueda: \"").append(filtro.trim()).append("\"");
         }
+        if (filtroExtra != null && !filtroExtra.isBlank()) {
+            if (!sb.isEmpty()) sb.append(" · ");
+            sb.append(filtroExtra);
+        }
         if (desde != null || hasta != null) {
             if (!sb.isEmpty()) sb.append(" · ");
-            sb.append("Periodo: ")
+            sb.append(etiquetaPeriodo).append(": ")
                     .append(desde != null ? desde.format(FMT_FECHA) : "inicio")
                     .append(" a ")
                     .append(hasta != null ? hasta.format(FMT_FECHA) : "hoy");
@@ -437,8 +462,4 @@ public class ExcelReporteGenerator {
             style.setRightBorderColor(color);
         }
     }
-
-
-
-
 }

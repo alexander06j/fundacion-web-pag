@@ -1,10 +1,13 @@
 package com.fundacionunidosporpinias.fundacion_web.dto.beneficiario;
 
 import com.fundacionunidosporpinias.fundacion_web.dto.AuditoriaDTO;
+import com.fundacionunidosporpinias.fundacion_web.model.Sexo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +22,9 @@ public class BeneficiarioResponseDTO extends AuditoriaDTO {
     private String apellido;
     private String telefono;
     private String direccion;
+    private LocalDate fechaNacimiento;
+    private Sexo sexo;
+    private String detalles;
 
     private Long parroquiaId;
 

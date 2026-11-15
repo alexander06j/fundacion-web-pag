@@ -3,16 +3,19 @@ package com.fundacionunidosporpinias.fundacion_web.controller.api;
 import com.fundacionunidosporpinias.fundacion_web.dto.beneficiario.BeneficiarioRequestDTO;
 import com.fundacionunidosporpinias.fundacion_web.dto.beneficiario.BeneficiarioResponseDTO;
 import com.fundacionunidosporpinias.fundacion_web.dto.entrega.EntregaResumenDTO;
+import com.fundacionunidosporpinias.fundacion_web.model.Sexo;
 import com.fundacionunidosporpinias.fundacion_web.service.IBeneficiarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,23 +25,32 @@ public class BeneficiarioRestController {
     @Autowired
     private IBeneficiarioService beneficiarioService;
 
-    @GetMapping("/paginado")
-    public ResponseEntity<Page<BeneficiarioResponseDTO>> listarPaginado(
-            @RequestParam(name = "q", defaultValue = "") String q,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
-    ) {
-        int tamano = (size < 1 || size > 100) ? 10 : size;
-        return ResponseEntity.ok(
-                beneficiarioService.buscarPaginado(q, PageRequest.of(Math.max(page, 0), tamano, Sort.by(Sort.Direction.DESC, "id")))
-        );
-    }
-
     @GetMapping
     public ResponseEntity<List<BeneficiarioResponseDTO>> listar() {
 
         return ResponseEntity.ok(
                 beneficiarioService.findAll()
+        );
+    }
+
+    @GetMapping("/paginado")
+    public ResponseEntity<Page<BeneficiarioResponseDTO>> listarPaginado(
+            @RequestParam(name = "q", defaultValue = "") String q,
+            @RequestParam(name = "sexo", required = false) Sexo sexo,
+            @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(name = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        int tamano = (size < 1 || size > 100) ? 10 : size;
+        return ResponseEntity.ok(
+                beneficiarioService.buscarPaginado(
+                        q,
+                        sexo,
+                        desde,
+                        hasta,
+                        PageRequest.of(Math.max(page, 0), tamano, Sort.by(Sort.Direction.DESC, "id"))
+                )
         );
     }
 

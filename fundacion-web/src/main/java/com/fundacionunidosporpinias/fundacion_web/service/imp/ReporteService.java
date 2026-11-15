@@ -4,6 +4,7 @@ package com.fundacionunidosporpinias.fundacion_web.service.imp;
 import com.fundacionunidosporpinias.fundacion_web.exception.NotFoundException;
 import com.fundacionunidosporpinias.fundacion_web.model.Beneficiario;
 import com.fundacionunidosporpinias.fundacion_web.model.Entrega;
+import com.fundacionunidosporpinias.fundacion_web.model.Sexo;
 import com.fundacionunidosporpinias.fundacion_web.repository.BeneficiarioRepository;
 import com.fundacionunidosporpinias.fundacion_web.repository.EntregaRepository;
 import com.fundacionunidosporpinias.fundacion_web.repository.UsuarioRepository;
@@ -19,7 +20,6 @@ import java.util.Map;
 
 @Service
 public class ReporteService implements IReporteService {
-
 
     private final BeneficiarioRepository beneficiarioRepository;
     private final EntregaRepository entregaRepository;
@@ -51,9 +51,9 @@ public class ReporteService implements IReporteService {
 
     @Override
     @Transactional(readOnly = true)
-    public byte[] exportarBeneficiariosExcel(String q) {
+    public byte[] exportarBeneficiariosExcel(String q, Sexo sexo, LocalDate desde, LocalDate hasta) {
         String filtro = q == null ? "" : q.trim();
-        List<Beneficiario> beneficiarios = beneficiarioRepository.buscarParaReporte(filtro);
+        List<Beneficiario> beneficiarios = beneficiarioRepository.buscarParaReporte(filtro, sexo, desde, hasta);
 
         Map<Long, Long> entregasPorBeneficiario = new HashMap<>();
         for (Object[] fila : entregaRepository.contarPorBeneficiario()) {
@@ -62,7 +62,7 @@ public class ReporteService implements IReporteService {
             entregasPorBeneficiario.put(benId, total);
         }
 
-        return excelGenerator.generarBeneficiariosXlsx(beneficiarios, entregasPorBeneficiario, filtro);
+        return excelGenerator.generarBeneficiariosXlsx(beneficiarios, entregasPorBeneficiario, filtro, sexo, desde, hasta);
     }
 
     @Override
@@ -81,5 +81,4 @@ public class ReporteService implements IReporteService {
                 .map(u -> u.getNombreCompleto() + " (" + u.getUsername() + ")")
                 .orElse(username);
     }
-
 }

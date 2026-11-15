@@ -36,6 +36,10 @@ public class Producto extends Auditable {
     @NotBlank(message = "La categoría es obligatoria")
     private String categoria;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private OrigenProducto origen;
+
     @OneToMany(mappedBy = "producto",cascade = CascadeType.ALL)
     private List<DetalleEntrega> detallesEntrega = new ArrayList<>();
 
