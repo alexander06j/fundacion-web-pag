@@ -3,389 +3,821 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundación Unidos por Piñas - Ayuda Social Comunitaria</title>
-    <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-dark: #0f172a;
-            --accent: #2563eb;
-            --success: #10b981;
-            --bg-light: #f8fafc;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        /* Top Nav Pública */
-        .public-nav {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .public-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .public-brand span.logo-icon {
-            font-size: 1.8rem;
-        }
-
-        .btn-nav-login {
-            background: var(--primary);
-            color: white;
-            text-decoration: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: 0.2s;
-        }
-
-        .btn-nav-login:hover {
-            background: #1e40af;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
-            color: white;
-            text-align: center;
-            padding: 100px 24px 120px;
-            position: relative;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 24px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .hero h1 {
-            font-size: 3.2rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            letter-spacing: -0.02em;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            max-width: 680px;
-            margin: 0 auto 36px;
-            opacity: 0.92;
-            font-weight: 300;
-        }
-
-        .btn-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--success);
-            color: white;
-            padding: 16px 36px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            text-decoration: none;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
-            transition: all 0.2s ease;
-        }
-
-        .btn-cta:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 14px 28px rgba(16, 185, 129, 0.45);
-        }
-
-        /* Sección Informativa */
-        .info-section {
-            max-width: 1200px;
-            margin: -60px auto 80px;
-            padding: 0 24px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 28px;
-        }
-
-        .info-card {
-            background: #ffffff;
-            padding: 36px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .info-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-icon {
-            font-size: 2.4rem;
-            width: 64px;
-            height: 64px;
-            background: #eff6ff;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .info-card h3 {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-
-        .info-card p {
-            color: var(--text-muted);
-            font-size: 0.98rem;
-            line-height: 1.6;
-        }
-
-        /* Sección Territorial */
-        .territorial-section {
-            max-width: 1200px;
-            margin: 0 auto 90px;
-            padding: 0 24px;
-            text-align: center;
-        }
-
-        .territorial-section h2 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 12px;
-            font-weight: 800;
-        }
-
-        .territorial-section p.sub {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 36px;
-        }
-
-        .parroquias-pills {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .parroquia-pill {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: 1px solid #cbd5e1;
-            font-weight: 600;
-            color: #334155;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        }
-
-        /* Footer */
-        .public-footer {
-            background: #0f172a;
-            color: #94a3b8;
-            padding: 60px 24px 30px;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-col h4 {
-            color: #ffffff;
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-col ul li a {
-            color: #94a3b8;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-col ul li a:hover {
-            color: #ffffff;
-        }
-
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-top: 24px;
-            border-top: 1px solid #1e293b;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            .hero p {
-                font-size: 1.05rem;
-            }
-            .info-section {
-                margin-top: -30px;
-            }
-        }
-    </style>
+    <title>Fundación Unidos por Piñas — Ayuda Social y Comunitaria</title>
+    <link rel="stylesheet" th:href="@{/css/public.css}">
 </head>
-<body>
+<body class="public-body">
 
-<!-- Navegación Superior Pública -->
-<header class="public-nav">
-    <a th:href="@{/}" class="public-brand">
-        <span class="logo-icon">🤝</span>
-        <span>Fundación Unidos por Piñas</span>
-    </a>
+<!-- Barra de Navegación Sencilla y Responsive -->
+<header class="public-navbar">
+    <div class="navbar-inner">
+        <a th:href="@{/}" class="brand-link">
+            <img th:src="@{/images/logo-fundacion.jpg}"
+                 alt="Logo Fundación Unidos por Piñas"
+                 class="brand-logo">
+            <div class="brand-text">
+                <span class="brand-name">Fundación Unidos por Piñas</span>
+                <span class="brand-location">Piñas, El Oro · RUC 0791840310001</span>
+            </div>
+        </a>
 
-    <a th:href="@{/login}" class="btn-nav-login">
-        Acceso Administrativo →
-    </a>
+        <!-- Botón de Menú para Móviles y Tablets -->
+        <button type="button"
+                class="mobile-menu-toggle"
+                id="btnMobileMenu"
+                aria-label="Abrir menú de navegación">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+
+        <!-- Enlaces y Botones (Colapsables en móvil/tablet) -->
+        <div class="nav-collapsible" id="navCollapsible">
+            <ul class="nav-menu">
+                <li><a href="#labor">Qué Hacemos</a></li>
+                <li><a href="#cobertura">Cobertura</a></li>
+                <li><a href="#donar">Cómo Donar</a></li>
+                <li><a href="#transparencia">Transparencia</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <th:block th:if="${usuarioUsername != null}">
+                    <span class="user-pill" th:text="${usuarioNombre}">Usuario</span>
+                    <a th:href="@{/dashboard}" class="btn-pub btn-pub-primary">Ir al Panel</a>
+                </th:block>
+
+                <th:block th:if="${usuarioUsername == null}">
+                    <a href="#donar" class="btn-pub btn-pub-success">Donar Ahora</a>
+                    <a th:href="@{/login}" class="btn-pub btn-pub-primary">Iniciar Sesión</a>
+                </th:block>
+            </div>
+        </div>
+    </div>
 </header>
 
-<!-- Hero Section -->
-<section class="hero">
-    <span class="hero-badge">Compromiso Social y Solidario</span>
-    <h1>Fundación Unidos por Piñas</h1>
-    <p>
-        Plataforma oficial para la coordinación comunitaria, registro de beneficiarios
-        y gestión logística de ayudas sociales en el cantón Piñas.
-    </p>
-    <a th:href="@{/login}" class="btn-cta">
-        🔒 Ingresar al Panel de Gestión
-    </a>
-</section>
-
-<!-- Sección Informativa con Tarjetas Estáticas -->
-<section class="info-section">
-    <div class="info-grid">
-
-        <div class="info-card">
-            <div class="card-icon">🔍</div>
-            <h3>Transparencia Absoluta</h3>
+<!-- Portada Principal (Clara, Directa y Amigable) -->
+<section class="hero-banner">
+    <div class="pub-container hero-inner">
+        <div class="hero-text">
+            <span class="hero-tag">Organización Social sin Fines de Lucro</span>
+            <h1>Juntos apoyamos a las familias que más lo necesitan en Piñas</h1>
             <p>
-                Registro fidedigno de cada donación y entrega comunitaria, asegurando la
-                máxima claridad y trazabilidad de los recursos dirigidos a las familias.
+                Coordinamos la entrega gratuita y transparente de alimentos, medicinas e insumos básicos
+                en las parroquias urbanas y rurales de Piñas, Zaruma y Portovelo.
             </p>
+            <div class="hero-buttons">
+                <a href="#donar" class="btn-pub btn-pub-success btn-pub-lg">
+                    Quiero Realizar una Donación
+                </a>
+                <a href="#contacto" class="btn-pub btn-pub-ghost-light btn-pub-lg">
+                    Contactar a la Fundación
+                </a>
+            </div>
         </div>
 
-        <div class="info-card">
-            <div class="card-icon">🗺️</div>
-            <h3>Cobertura Territorial</h3>
+        <div class="hero-logo-card">
+            <img th:src="@{/images/logo-fundacion.jpg}" alt="Emblema Fundación Unidos por Piñas">
+            <h2>Fundación Unidos por Piñas</h2>
             <p>
-                Articulación integral en todas las parroquias urbanas y rurales del cantón Piñas
-                para asegurar que la asistencia llegue a quien más lo necesita.
+                Sede Matriz: Sucre y 10 de Agosto, Piñas El Oro<br>
+                WhatsApp: <strong>099 515 5737</strong>
             </p>
         </div>
-
-        <div class="info-card">
-            <div class="card-icon">📊</div>
-            <h3>Gestión Eficiente</h3>
-            <p>
-                Control de inventarios en tiempo real y métricas operativas que optimizan
-                la preparación, despacho y seguimiento de paquetes de ayuda.
-            </p>
-        </div>
-
     </div>
 </section>
 
-<!-- Sección Territorial -->
-<section class="territorial-section">
-    <h2>Nuestra Cobertura Comunitaria</h2>
-    <p class="sub">Atención constante en los diversos sectores y comunidades del cantón Piñas</p>
-    <div class="parroquias-pills">
-        <span class="parroquia-pill">📍 Piñas (Matriz)</span>
+<!-- Barra de 4 Indicadores Rápidos -->
+<section class="stats-bar-wrap" id="impacto">
+    <div class="pub-container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${totalParroquias != null ? totalParroquias : 23}">23</span>
+                    <span class="stat-label">Parroquias Cubiertas</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${totalCantones != null ? totalCantones : 3}">3</span>
+                    <span class="stat-label">Cantones Atendidos</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${totalBeneficiarios != null ? totalBeneficiarios : 0}">0</span>
+                    <span class="stat-label">Familias Registradas</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${totalEntregas != null ? totalEntregas : 0}">0</span>
+                    <span class="stat-label">Entregas Realizadas</span>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- Footer con Enlaces Institucionales, Redes y Derechos -->
+<!-- Sección 1: ¿Qué Hacemos? -->
+<section id="labor" class="section-block">
+    <div class="pub-container">
+        <div class="section-title-box">
+            <h2>Nuestra Labor en la Comunidad</h2>
+            <p>Trabajamos de forma ordenada para que cada donación llegue directamente a los hogares vulnerables.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
+                <h3>Transparencia Total</h3>
+                <p>
+                    Cada entrega se respalda con un acta firmada por el beneficiario y un registro auditado
+                    en nuestro sistema para garantizar el buen uso de los recursos.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    </svg>
+                </div>
+                <h3>Atención a Familias</h3>
+                <p>
+                    Priorizamos a personas adultas mayores, familias con cargas vulnerables y hogares de
+                    sectores urbanos y rurales que requieren asistencia prioritaria.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                </div>
+                <h3>Ayuda Directa y Gratuita</h3>
+                <p>
+                    Distribuimos kits de alimentos, insumos de salud, útiles escolares y vestimenta sin ningún
+                    costo ni intermediarios (<strong th:text="${totalStockDisponible != null ? totalStockDisponible : 0}">0</strong> unidades actualmente en bodega).
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección 2: Cobertura Territorial Compacta (Piñas, Zaruma y Portovelo) -->
+<section id="cobertura" class="section-block section-block-alt">
+    <div class="pub-container">
+        <div class="section-title-box">
+            <h2>Cobertura Territorial</h2>
+            <p>Toca cualquiera de los 3 cantones para ver sus parroquias cubiertas o usa el buscador.</p>
+        </div>
+
+        <div class="coverage-card">
+            <div class="coverage-header">
+                <span class="coverage-header-text">
+                    Atención activa en <strong>Piñas, Zaruma y Portovelo</strong> (<span th:text="${totalParroquias != null ? totalParroquias : 23}">23</span> parroquias)
+                </span>
+
+                <div class="search-parroquia-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <input type="text"
+                           id="inputBuscarParroquiaPublica"
+                           class="search-parroquia-input"
+                           placeholder="Buscar una parroquia...">
+                </div>
+            </div>
+
+            <!-- 3 Botones de Cantón (Plegados por defecto para no alargar la página) -->
+            <div class="canton-buttons-grid" id="cantonCardsContainer" th:if="${!#lists.isEmpty(catalogoParroquias)}">
+                <button type="button"
+                        class="canton-selector-card"
+                        th:each="entry : ${parroquiasPorCanton}"
+                        th:attr="data-canton=${entry.key}">
+                    <div class="canton-card-info">
+                        <h3 th:text="${'Cantón ' + entry.key}">Cantón Piñas</h3>
+                        <span th:text="${#lists.size(entry.value) + ' parroquias cubiertas'}">9 parroquias cubiertas</span>
+                    </div>
+                    <span class="canton-card-action">
+                        <span class="canton-toggle-label">Ver lista</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+
+            <!-- Lista desplegable de parroquias (oculta por defecto) -->
+            <div id="panelDetalleParroquias" class="parroquias-drawer" style="display: none;" th:if="${!#lists.isEmpty(catalogoParroquias)}">
+                <div class="drawer-top-bar">
+                    <strong id="tituloDrawerCanton">Parroquias</strong>
+                    <button type="button" id="btnCerrarDrawerParroquias" class="btn-close-drawer">
+                        Cerrar ✕
+                    </button>
+                </div>
+
+                <div class="parroquias-pills-list" id="gridParroquiasPublicas">
+                    <div class="parroquia-chip"
+                         th:each="item : ${catalogoParroquias}"
+                         th:attr="data-canton=${item.canton}, data-search=${#strings.toLowerCase(item.nombre + ' ' + item.canton)}">
+                        <span th:text="${item.nombre}">Piñas (Matriz)</span>
+                        <span class="chip-canton-tag" th:text="${item.canton}">Piñas</span>
+                        <span class="chip-stat-badge" th:if="${item.totalBeneficiarios > 0}" th:text="${item.totalBeneficiarios + ' hogares'}">1 hogar</span>
+                    </div>
+                </div>
+
+                <div id="mensajeSinParroquias" class="territorial-empty-msg">
+                    No se encontraron parroquias con ese nombre.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección 3: Cómo Donar (Cuenta Bancaria + Centro de Acopio) -->
+<section id="donar" class="section-block">
+    <div class="pub-container">
+        <div class="section-title-box">
+            <h2>¿Cómo Puedes Ayudar?</h2>
+            <p>Puedes realizar tu aporte mediante transferencia bancaria o entregando insumos en nuestra sede en Piñas.</p>
+        </div>
+
+        <div class="donation-layout">
+            <!-- Tarjeta 1: Cuenta Bancaria Oficial -->
+            <div class="bank-donation-card">
+                <div>
+                    <div class="bank-card-top">
+                        <div>
+                            <span class="bank-pill">Transferencia o Depósito Directo</span>
+                            <h3>Cuenta Oficial Banco Pichincha</h3>
+                        </div>
+                        <img th:src="@{/images/logo-fundacion.jpg}"
+                             alt="Logo Fundación Unidos por Piñas"
+                             class="brand-logo">
+                    </div>
+
+                    <div class="bank-rows">
+                        <div class="bank-row-item">
+                            <div>
+                                <span class="bank-row-label">Banco y Tipo de Cuenta</span>
+                                <span class="bank-row-value">Banco Pichincha — Cuenta de Ahorros</span>
+                            </div>
+                        </div>
+
+                        <div class="bank-row-item">
+                            <div>
+                                <span class="bank-row-label">Número de Cuenta</span>
+                                <span class="bank-row-value highlight-number" id="txtNumeroCuenta">2207319619</span>
+                            </div>
+                            <button type="button" class="btn-copy-inline" data-copy="2207319619">
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+
+                        <div class="bank-row-item">
+                            <div>
+                                <span class="bank-row-label">Nombre del Titular</span>
+                                <span class="bank-row-value">Fundación Unidos por Piñas</span>
+                            </div>
+                        </div>
+
+                        <div class="bank-row-item">
+                            <div>
+                                <span class="bank-row-label">RUC</span>
+                                <span class="bank-row-value highlight-number" id="txtRucFundacion">0791840310001</span>
+                            </div>
+                            <button type="button" class="btn-copy-inline" data-copy="0791840310001">
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+
+                        <div class="bank-row-item">
+                            <div>
+                                <span class="bank-row-label">Correo para Notificación</span>
+                                <span class="bank-row-value">fundacion.unidosporpinas@gmail.com</span>
+                            </div>
+                            <button type="button" class="btn-copy-inline" data-copy="fundacion.unidosporpinas@gmail.com">
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bank-actions-row">
+                    <button type="button" class="btn-pub btn-pub-outline" id="btnCopiarTodosDatosBancarios">
+                        <span>Copiar Todos los Datos</span>
+                    </button>
+
+                    <a href="https://wa.me/593995155737?text=Hola%20Fundaci%C3%B3n%20Unidos%20por%20Pi%C3%B1as%2C%20les%20comparto%20el%20comprobante%20de%20mi%20donaci%C3%B3n%20a%20la%20Cuenta%20de%20Ahorros%20Banco%20Pichincha%202207319619."
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn-pub btn-pub-success">
+                        <span>Enviar Comprobante por WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2: Donación de Alimentos e Insumos -->
+            <div class="acopio-card">
+                <div>
+                    <h3>Donación de Alimentos e Insumos</h3>
+                    <p>
+                        También puedes acercarte a nuestro centro de acopio en Piñas para donar artículos de
+                        primera necesidad:
+                    </p>
+
+                    <ul class="acopio-list">
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M20 6 9 17l-5-5"/></svg>
+                            <span>Alimentos no perecibles (arroz, aceite, enlatados)</span>
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M20 6 9 17l-5-5"/></svg>
+                            <span>Medicinas e insumos de salud o movilidad</span>
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M20 6 9 17l-5-5"/></svg>
+                            <span>Útiles escolares y material educativo</span>
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M20 6 9 17l-5-5"/></svg>
+                            <span>Ropa, calzado y cobijas en buen estado</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="acopio-address-box">
+                    <strong>Dirección del Centro de Acopio:</strong><br>
+                    Calles Sucre y 10 de Agosto, Piñas El Oro.<br>
+                    <strong>WhatsApp de coordinación:</strong> 099 515 5737
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección 4: Transparencia en Vivo -->
+<section id="transparencia" class="section-block section-block-alt">
+    <div class="pub-container">
+        <div class="section-title-box">
+            <h2>Transparencia y Actividad Reciente</h2>
+            <p>Consulta las últimas entregas registradas en nuestro sistema (con identidad familiar protegida).</p>
+        </div>
+
+        <div class="transparency-layout">
+            <div class="clean-panel">
+                <div class="clean-panel-header">
+                    <h3>Últimas Entregas Realizadas</h3>
+                    <span class="badge-soft">Datos Personales Protegidos</span>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="clean-table">
+                        <thead>
+                        <tr>
+                            <th>Acta</th>
+                            <th>Fecha</th>
+                            <th>Familia</th>
+                            <th>Parroquia</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ent : ${entregasRecientesPublicas}">
+                            <td><strong th:text="${ent.codigoActa}">ACTA-00001</strong></td>
+                            <td th:text="${ent.fechaFormateada}">24/11/2026</td>
+                            <td th:text="${ent.beneficiarioAnonimizado}">Hogar M. E.</td>
+                            <td th:text="${ent.parroquiaNombre}">Piñas (Matriz)</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(entregasRecientesPublicas)}">
+                            <td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">
+                                Aún no hay entregas registradas en el período actual.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="clean-panel">
+                <div class="clean-panel-header">
+                    <h3>Estado de Bodega</h3>
+                </div>
+
+                <div class="origin-summary-grid">
+                    <div class="origin-box">
+                        <strong th:text="${productosDonados != null ? productosDonados : 0}">0</strong>
+                        <span>Productos Donados</span>
+                    </div>
+                    <div class="origin-box">
+                        <strong th:text="${productosComprados != null ? productosComprados : 0}">0</strong>
+                        <span>Compra Propia</span>
+                    </div>
+                </div>
+
+                <div class="category-pills-col" th:if="${!#lists.isEmpty(categoriasResumen)}">
+                    <div class="cat-row-pill" th:each="cat : ${categoriasResumen}">
+                        <strong th:text="${cat.categoria}">Alimentos</strong>
+                        <span th:text="${cat.unidadesDisponibles + ' unid.'}">25 unid.</span>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(categoriasResumen)}" style="text-align: center; padding: 16px; color: #64748b; font-size: 0.86rem;">
+                    Las categorías disponibles se mostrarán al registrar productos en bodega.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección 5: Contacto Directo -->
+<section id="contacto" class="section-block">
+    <div class="pub-container">
+        <div class="section-title-box">
+            <h2>Contáctanos</h2>
+            <p>Escríbenos por WhatsApp o correo electrónico para cualquier consulta, donación o solicitud.</p>
+        </div>
+
+        <div class="contact-layout">
+            <!-- Datos de Contacto -->
+            <div class="clean-panel">
+                <h3>Canales Oficiales de Atención</h3>
+                <div class="contact-list-items">
+                    <div class="contact-item-box">
+                        <div class="contact-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="contact-item-text">
+                            <strong>Dirección en Piñas</strong>
+                            <span>Sucre y 10 de Agosto, Piñas El Oro</span><br>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Sucre+y+10+de+Agosto,+Pi%C3%B1as,+El+Oro,+Ecuador"
+                               target="_blank" rel="noopener noreferrer">
+                                Ver en Google Maps →
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-item-box">
+                        <div class="contact-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-item-text">
+                            <strong>WhatsApp Oficial</strong>
+                            <a href="https://wa.me/593995155737" target="_blank" rel="noopener noreferrer">
+                                099 515 5737 (Enviar mensaje por WhatsApp)
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-item-box">
+                        <div class="contact-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                        </div>
+                        <div class="contact-item-text">
+                            <strong>Correo Electrónico</strong>
+                            <a href="mailto:fundacion.unidosporpinas@gmail.com">
+                                fundacion.unidosporpinas@gmail.com
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-item-box">
+                        <div class="contact-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-item-text">
+                            <strong>Facebook Oficial</strong>
+                            <a href="https://www.facebook.com/search/top?q=Fundaci%C3%B3n%20Unidos%20por%20Pi%C3%B1as"
+                               target="_blank" rel="noopener noreferrer">
+                                Fundación Unidos por Piñas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario Sencillo de Mensaje Directo -->
+            <div class="clean-panel">
+                <h3>Envíanos un Mensaje Rápido</h3>
+                <form id="formContactoPublico" class="simple-form" onsubmit="return false;">
+                    <div class="simple-form-row">
+                        <div class="form-field">
+                            <label for="contactoNombre">Tu Nombre</label>
+                            <input type="text" id="contactoNombre" class="form-input" placeholder="Ej. María Romero" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="contactoParroquia">Parroquia o Ciudad</label>
+                            <input type="text" id="contactoParroquia" class="form-input" placeholder="Ej. Piñas">
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="contactoMotivo">Motivo</label>
+                        <select id="contactoMotivo" class="form-input">
+                            <option value="Donación / Envío de Comprobante">Quiero hacer una donación / Enviar comprobante</option>
+                            <option value="Donación de Alimentos o Insumos">Quiero donar alimentos o insumos</option>
+                            <option value="Información de Empadronamiento">Consulta sobre registro de beneficiarios</option>
+                            <option value="Voluntariado">Quiero apoyar como voluntario</option>
+                            <option value="Consulta General">Otra consulta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="contactoMensaje">Mensaje</label>
+                        <textarea id="contactoMensaje" rows="3" class="form-input" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+
+                    <div class="form-buttons-row">
+                        <button type="button" class="btn-pub btn-pub-success" id="btnEnviarContactoWhatsApp">
+                            <span>Enviar por WhatsApp</span>
+                        </button>
+                        <button type="button" class="btn-pub btn-pub-primary" id="btnEnviarContactoCorreo">
+                            <span>Enviar por Correo</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pie de Página -->
 <footer class="public-footer">
-    <div class="footer-content">
-        <div class="footer-col">
-            <h4>Fundación Unidos por Piñas</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6;">
-                Organización solidaria sin fines de lucro dedicada al bienestar,
-                apoyo alimentario e impulso comunitario en el cantón Piñas, El Oro, Ecuador.
-            </p>
+    <div class="pub-container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Fundación Unidos por Piñas</h4>
+                <p>
+                    Organización solidaria sin fines de lucro dedicada al bienestar y apoyo comunitario
+                    en Piñas, Zaruma y Portovelo (Provincia de El Oro, Ecuador).<br>
+                    <strong>RUC:</strong> 0791840310001
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="#labor">Nuestra Labor</a></li>
+                    <li><a href="#cobertura">Cobertura Territorial</a></li>
+                    <li><a href="#donar">Cuenta para Donaciones</a></li>
+                    <li><a href="#transparencia">Transparencia</a></li>
+                    <li><a th:href="@{/login}">Acceso Administrativo</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contacto y Donaciones</h4>
+                <ul class="footer-links">
+                    <li>Sucre y 10 de Agosto, Piñas El Oro</li>
+                    <li><a href="https://wa.me/593995155737" target="_blank" rel="noopener noreferrer">WhatsApp: 099 515 5737</a></li>
+                    <li><a href="mailto:fundacion.unidosporpinas@gmail.com">fundacion.unidosporpinas@gmail.com</a></li>
+                    <li>Banco Pichincha · Cta. Ahorros 2207319619</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="footer-col">
-            <h4>Enlaces Institucionales</h4>
-            <ul>
-                <li><a th:href="@{/}">Inicio</a></li>
-                <li><a th:href="@{/login}">Portal Administrativo</a></li>
-                <li><a href="#territorial">Cobertura Parroquial</a></li>
-            </ul>
+        <div class="footer-bottom">
+            <span>© 2026 Fundación Unidos por Piñas. Todos los derechos reservados.</span>
+            <span>Piñas — El Oro, Ecuador</span>
         </div>
-
-        <div class="footer-col">
-            <h4>Redes y Contacto</h4>
-            <ul>
-                <li><a href="https://facebook.com" target="_blank">Facebook Institucional</a></li>
-                <li><a href="https://instagram.com" target="_blank">Instagram Comunidad</a></li>
-                <li><span>📧 contacto@unidosporpinias.org</span></li>
-                <li><span>📞 (+593) 07 297-6100</span></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        © 2026 Fundación Unidos por Piñas. Todos los derechos reservados.
     </div>
 </footer>
+
+<!-- Scripts: Menú Móvil, Cobertura Desplegable, Copiado Bancario y Contacto -->
+<script>
+    (function () {
+        // 1. Menú Hamburguesa para Móvil y Tablet
+        const btnMobileMenu = document.getElementById('btnMobileMenu');
+        const navCollapsible = document.getElementById('navCollapsible');
+        if (btnMobileMenu && navCollapsible) {
+            btnMobileMenu.addEventListener('click', function () {
+                navCollapsible.classList.toggle('open');
+            });
+            navCollapsible.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => navCollapsible.classList.remove('open'));
+            });
+        }
+
+        // 2. Cobertura Territorial Compacta (Parroquias ocultas por defecto)
+        const cantonCardsContainer = document.getElementById('cantonCardsContainer');
+        const drawer = document.getElementById('panelDetalleParroquias');
+        const drawerTitle = document.getElementById('tituloDrawerCanton');
+        const btnCerrarDrawer = document.getElementById('btnCerrarDrawerParroquias');
+        const searchInput = document.getElementById('inputBuscarParroquiaPublica');
+        const grid = document.getElementById('gridParroquiasPublicas');
+        const emptyMsg = document.getElementById('mensajeSinParroquias');
+
+        if (grid && drawer) {
+            const chips = Array.from(grid.querySelectorAll('.parroquia-chip'));
+            const cantonButtons = cantonCardsContainer
+                    ? Array.from(cantonCardsContainer.querySelectorAll('.canton-selector-card'))
+                    : [];
+            let cantonSeleccionado = null;
+
+            function actualizarBotonesCanton() {
+                cantonButtons.forEach(btn => {
+                    const activo = btn.getAttribute('data-canton') === cantonSeleccionado;
+                    btn.classList.toggle('active', activo);
+                    const lbl = btn.querySelector('.canton-toggle-label');
+                    if (lbl) lbl.textContent = activo ? 'Ocultar' : 'Ver lista';
+                });
+            }
+
+            function actualizarVistaParroquias() {
+                const termino = (searchInput ? searchInput.value : '').trim().toLowerCase();
+
+                if (!cantonSeleccionado && !termino) {
+                    drawer.style.display = 'none';
+                    actualizarBotonesCanton();
+                    return;
+                }
+
+                drawer.style.display = 'block';
+                let visibles = 0;
+
+                chips.forEach(chip => {
+                    const canton = chip.getAttribute('data-canton') || '';
+                    const texto = chip.getAttribute('data-search') || '';
+                    const okCanton = !cantonSeleccionado || canton === cantonSeleccionado;
+                    const okTexto = !termino || texto.includes(termino);
+
+                    if (okCanton && okTexto) {
+                        chip.style.display = '';
+                        visibles++;
+                    } else {
+                        chip.style.display = 'none';
+                    }
+                });
+
+                if (drawerTitle) {
+                    if (termino && cantonSeleccionado) {
+                        drawerTitle.textContent = `Parroquias de ${cantonSeleccionado} que coinciden con "${searchInput.value.trim()}" (${visibles})`;
+                    } else if (termino) {
+                        drawerTitle.textContent = `Resultados para "${searchInput.value.trim()}" (${visibles})`;
+                    } else {
+                        drawerTitle.textContent = `Parroquias del Cantón ${cantonSeleccionado} (${visibles})`;
+                    }
+                }
+
+                if (emptyMsg) {
+                    emptyMsg.style.display = visibles === 0 ? 'block' : 'none';
+                }
+
+                actualizarBotonesCanton();
+            }
+
+            if (cantonCardsContainer) {
+                cantonCardsContainer.addEventListener('click', function (e) {
+                    const btn = e.target.closest('.canton-selector-card');
+                    if (!btn) return;
+                    const canton = btn.getAttribute('data-canton');
+                    cantonSeleccionado = (cantonSeleccionado === canton) ? null : canton;
+                    actualizarVistaParroquias();
+                });
+            }
+
+            if (btnCerrarDrawer) {
+                btnCerrarDrawer.addEventListener('click', function () {
+                    cantonSeleccionado = null;
+                    if (searchInput) searchInput.value = '';
+                    actualizarVistaParroquias();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', actualizarVistaParroquias);
+            }
+        }
+
+        // 3. Copiado de Cuenta Bancaria y RUC en 1 clic
+        function copiarAlPortapapeles(texto, boton, mensajeExito) {
+            if (!navigator.clipboard) {
+                const area = document.createElement('textarea');
+                area.value = texto;
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                document.body.removeChild(area);
+            } else {
+                navigator.clipboard.writeText(texto);
+            }
+
+            if (boton) {
+                const span = boton.querySelector('span');
+                const original = span ? span.textContent : boton.textContent;
+                boton.classList.add('copied');
+                if (span) span.textContent = mensajeExito || '¡Copiado!';
+                setTimeout(() => {
+                    boton.classList.remove('copied');
+                    if (span) span.textContent = original;
+                }, 2000);
+            }
+        }
+
+        document.querySelectorAll('.btn-copy-inline').forEach(btn => {
+            btn.addEventListener('click', function () {
+                copiarAlPortapapeles(btn.getAttribute('data-copy') || '', btn, '¡Copiado!');
+            });
+        });
+
+        const btnCopiarTodo = document.getElementById('btnCopiarTodosDatosBancarios');
+        if (btnCopiarTodo) {
+            btnCopiarTodo.addEventListener('click', function () {
+                const datos = [
+                    'Fundación Unidos por Piñas',
+                    'Banco: Banco Pichincha',
+                    'Tipo: Cuenta de Ahorros',
+                    'Número de Cuenta: 2207319619',
+                    'RUC: 0791840310001',
+                    'Correo: fundacion.unidosporpinas@gmail.com'
+                ].join('\n');
+                copiarAlPortapapeles(datos, btnCopiarTodo, '¡Datos Copiados!');
+            });
+        }
+
+        // 4. Envío de formulario rápido por WhatsApp o Correo
+        function obtenerDatosContacto() {
+            const nombre = (document.getElementById('contactoNombre')?.value || '').trim() || 'Ciudadano';
+            const parroquia = (document.getElementById('contactoParroquia')?.value || '').trim() || 'Piñas';
+            const motivo = (document.getElementById('contactoMotivo')?.value || 'Consulta General').trim();
+            const mensaje = (document.getElementById('contactoMensaje')?.value || '').trim() || 'Hola, deseo comunicarme con la Fundación Unidos por Piñas.';
+
+            return {
+                motivo,
+                texto: `Hola Fundación Unidos por Piñas,\n\n` +
+                       `• Nombre: ${nombre}\n` +
+                       `• Parroquia/Ciudad: ${parroquia}\n` +
+                       `• Motivo: ${motivo}\n` +
+                       `• Mensaje: ${mensaje}`
+            };
+        }
+
+        const btnWa = document.getElementById('btnEnviarContactoWhatsApp');
+        if (btnWa) {
+            btnWa.addEventListener('click', function () {
+                const { texto } = obtenerDatosContacto();
+                window.open('https://wa.me/593995155737?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+            });
+        }
+
+        const btnMail = document.getElementById('btnEnviarContactoCorreo');
+        if (btnMail) {
+            btnMail.addEventListener('click', function () {
+                const { motivo, texto } = obtenerDatosContacto();
+                window.location.href = 'mailto:fundacion.unidosporpinas@gmail.com' +
+                        '?subject=' + encodeURIComponent(motivo) +
+                        '&body=' + encodeURIComponent(texto);
+            });
+        }
+    })();
+</script>
 
 </body>
 </html>
