@@ -17,19 +17,42 @@ import java.util.*;
 @Configuration
 public class DataInitializer {
 
+    private static final Set<String> CANTONES_EXCLUIDOS_AUTO = Set.of(
+            "atahualpa",
+            "balsas",
+            "marcabelí",
+            "marcabeli",
+            "santa rosa",
+            "arenillas"
+    );
+
     @Bean
     @Order(10)
     public CommandLineRunner initData(IParroquiaService parroquiaService) {
         return args -> {
             try {
-                // Cargar catálogo territorial de Piñas y cantones cercanos sin duplicar existentes
+                // 1. Limpiar parroquias sembradas automáticamente de cantones descartados y recolectar las activas
                 Set<String> parroquiasExistentes = new HashSet<>();
                 for (ParroquiaResponseDTO existente : parroquiaService.findAll()) {
+                    String cantonNorm = existente.getCanton() != null ? normalizarNombre(existente.getCanton()) : "";
+                    boolean creadaPorSistema = existente.getCreadoPor() == null
+                            || "sistema".equalsIgnoreCase(existente.getCreadoPor().trim());
+
+                    if (CANTONES_EXCLUIDOS_AUTO.contains(cantonNorm) && creadaPorSistema && existente.getId() != null) {
+                        try {
+                            parroquiaService.delete(existente.getId());
+                            continue;
+                        } catch (Exception ignored) {
+                            // Si tiene beneficiarios asociados, se conserva por integridad referencial
+                        }
+                    }
+
                     if (existente.getNombre() != null) {
                         parroquiasExistentes.add(normalizarNombre(existente.getNombre()));
                     }
                 }
 
+                // 2. Cargar catálogo territorial de Piñas, Zaruma y Portovelo sin duplicar existentes
                 int nuevasCreadas = 0;
                 for (ParroquiaRequestDTO req : construirCatalogoParroquias()) {
                     String clave = normalizarNombre(req.getNombre());
@@ -77,41 +100,7 @@ public class DataInitializer {
                 new ParroquiaRequestDTO("Portovelo (Matriz)", "Portovelo"),
                 new ParroquiaRequestDTO("Curtincápac", "Portovelo"),
                 new ParroquiaRequestDTO("Morales", "Portovelo"),
-                new ParroquiaRequestDTO("Salatí", "Portovelo"),
-
-                // Cantón Atahualpa (colindante al norte)
-                new ParroquiaRequestDTO("Paccha (Matriz)", "Atahualpa"),
-                new ParroquiaRequestDTO("Ayapamba", "Atahualpa"),
-                new ParroquiaRequestDTO("Cordoncillo", "Atahualpa"),
-                new ParroquiaRequestDTO("Milagro", "Atahualpa"),
-                new ParroquiaRequestDTO("San José", "Atahualpa"),
-                new ParroquiaRequestDTO("San Juan de Cerro Azul", "Atahualpa"),
-
-                // Cantón Balsas (colindante al oeste)
-                new ParroquiaRequestDTO("Balsas (Matriz)", "Balsas"),
-                new ParroquiaRequestDTO("Bellamaría", "Balsas"),
-
-                // Cantón Marcabelí (colindante al oeste)
-                new ParroquiaRequestDTO("Marcabelí (Matriz)", "Marcabelí"),
-                new ParroquiaRequestDTO("El Ingenio", "Marcabelí"),
-
-                // Cantón Santa Rosa (colindante al noroeste)
-                new ParroquiaRequestDTO("Santa Rosa (Matriz)", "Santa Rosa"),
-                new ParroquiaRequestDTO("Nuevo Santa Rosa", "Santa Rosa"),
-                new ParroquiaRequestDTO("Puerto Jelí", "Santa Rosa"),
-                new ParroquiaRequestDTO("Bellamaría - Santa Rosa", "Santa Rosa"),
-                new ParroquiaRequestDTO("Bellavista", "Santa Rosa"),
-                new ParroquiaRequestDTO("Jambelí", "Santa Rosa"),
-                new ParroquiaRequestDTO("La Avanzada", "Santa Rosa"),
-                new ParroquiaRequestDTO("San Antonio", "Santa Rosa"),
-                new ParroquiaRequestDTO("Torata", "Santa Rosa"),
-                new ParroquiaRequestDTO("Victoria", "Santa Rosa"),
-
-                // Cantón Arenillas (colindante al oeste)
-                new ParroquiaRequestDTO("Arenillas (Matriz)", "Arenillas"),
-                new ParroquiaRequestDTO("Carcabón", "Arenillas"),
-                new ParroquiaRequestDTO("Chacras", "Arenillas"),
-                new ParroquiaRequestDTO("Palmales", "Arenillas")
+                new ParroquiaRequestDTO("Salatí", "Portovelo")
         );
     }
 
